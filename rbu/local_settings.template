@@ -28,3 +28,5 @@ DATABASES = {
         "PORT": "",
     }
 }
+
+COMPRESS_ENABLED = True

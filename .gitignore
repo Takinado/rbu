@@ -104,3 +104,5 @@ out
 gen
 
 *.sqlite3
+media/
+static/
