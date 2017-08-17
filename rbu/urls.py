@@ -20,10 +20,14 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from report.views import report_index
+from report.views import import_csv
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', report_index),
+    url(r'^$', report_index, name='report_index'),
+
+    # csv
+    url(r'^import_csv/$', import_csv, name='import_csv'),
 ]
 
 if settings.DEBUG:

@@ -1,0 +1,30 @@
+{% extends 'report/base.html' %}
+{% load bootstrap3 %}
+{% load staticfiles %}
+
+{% block title %}Импорт csv{% endblock %}
+{#{% block content %}#}
+{% block main_content %}
+    <h1>Импорт csv</h1>
+    {% if remained %}
+        <p>Осталось {{ remained }} файлов</p>
+    {% endif %}
+    {% if info %}
+        <h3>Прочитано {{ info.reads }}, добавлено {{ info.inserts }}, ошибок {{ info.errors }}</h3>
+    {% endif %}
+    {% if file == '' %}
+        <p>Файлов не найдено</p>
+    {% else %}
+        <p>Найден файл {{ file }}. {{ lines_sum }} строк.</p>
+        <div class="form">
+        {{ form.media }}
+            <form action="{% url 'import_csv' %}" method="post">{% csrf_token %}
+                {% bootstrap_form form %}
+                {% buttons %}
+                    <button type="submit" class="btn btn-primary">Обработать</button>
+                {% endbuttons %}
+            </form>
+        </div>
+    {% endif %}
+
+{% endblock %}
