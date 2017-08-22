@@ -103,3 +103,8 @@ body {
   display: inline-block;
   border-radius: 50%;
 }
+
+/*http://htmlbook.ru/faq/kak-ubrat-punktirnuyu-ramku-vokrug-ssylok*/
+.nav-tabs > li > a:focus {
+outline: none; /* Убираем границу вокруг ссылок  */
+}

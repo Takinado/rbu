@@ -3,8 +3,10 @@ import time
 import datetime
 import pytz
 # import unipath
+import simplejson
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from rbu import settings
@@ -204,3 +206,22 @@ def import_csv(request):
     context['form'] = form
     # print(context)
     return render(request, 'report/import.html', context)
+
+
+def ajax_test(request):
+    results = {'success': False}
+
+    # Тут — потрібні нам алгоритми
+    if True:
+        results = {'success': True, 'param1': 'Ти таки', 'param2': 'натиснув його!'}
+
+    json = simplejson.dumps(results)
+    return HttpResponse(json, content_type='application/json')
+
+
+# https://stackoverflow.com/questions/34774138/reload-table-data-in-django-without-refreshing-the-page
+def get_more_tables(request):
+    increment = int(request.GET['append_increment'])
+    increment_to = increment + 10
+    order = Status.objects.all().order_by('-id')[increment:increment_to]
+    return render(request, 'report/get_more_tables.html', {'order': order})

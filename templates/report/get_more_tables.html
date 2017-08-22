@@ -1,0 +1,11 @@
+{% for i in order %}
+    {% if i.order_booked %}
+    <tr class="success">
+    {% else %}
+    <tr>
+    {% endif %}
+        <td>{{ i.date }}</td>
+        <td>{{ i.cement }}</td>
+        <td>{{ i.get_img_shortname }}</td>
+    </tr>
+{% endfor %}

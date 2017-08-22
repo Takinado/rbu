@@ -106,3 +106,4 @@ gen
 *.sqlite3
 media/
 static/
+/dump.rdb
