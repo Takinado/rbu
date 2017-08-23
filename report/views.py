@@ -8,6 +8,8 @@ import simplejson
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.views.generic import DayArchiveView
+from django.views.generic.dates import MonthMixin
 
 from rbu import settings
 
@@ -18,12 +20,25 @@ from .models import InVents, OutVents, RbuStatus, Status
 
 
 def report_index(request):
+    now = datetime.datetime.now()
+
+    # now.year = '2017'
+    # now.month = '7'
+    # now.day = '29'
+
+    now = {
+        'year': 2017,
+        'month': 7,
+        'day': 29
+    }
+
     status = Status()
     try:
         status = Status.objects.latest('id')
     except ObjectDoesNotExist:
         print(type(status))
-    context = {'status': status}
+
+    context = {'status': status, 'now': now}
     return render(request, 'report/index.html', context)
 
 
@@ -225,3 +240,38 @@ def get_more_tables(request):
     increment_to = increment + 10
     order = Status.objects.all().order_by('-id')[increment:increment_to]
     return render(request, 'report/get_more_tables.html', {'order': order})
+
+
+class StatusDayView(DayArchiveView, MonthMixin):
+    # queryset = Status.objects.all()
+    queryset = Status.objects.all().select_related('rbu_statuses', 'vents1', 'vents2')\
+        .filter(no_error=True)
+    date_field = "date"
+    ordering = 'date'
+    allow_future = True
+    month_format = '%m'
+    paginate_by = 200
+    # template_name = 'report/status_list.html'
+
+
+def status_day_view(request, year=None, month=None, day=None):
+    now = datetime.datetime.now()
+    year = '2017'
+    month = '7'
+    day = '29'
+    if not year:
+        year = now.year
+    if not month:
+        month = now.month
+    if not day:
+        day = now.day
+    statuses = Status.objects.filter(
+                date__year=year,
+                date__month=month,
+                date__day=day
+            ).order_by('date')
+    print(statuses)
+
+    context = {'status_list': statuses,
+               }
+    return render(request, 'report/status_archive_day.html', context)

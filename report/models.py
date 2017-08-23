@@ -55,7 +55,7 @@ class OutVents(models.Model):
 
     def __str__(self):
         if self.name:
-            return self.name.encode('utf8')
+            return self.name
         else:
             return str(self.him) + ';' + str(self.water) + ';' + str(self.cement) + ';' + str(self.composite)
 
@@ -103,7 +103,7 @@ class RbuStatus(models.Model):
     skip_directions = models.CharField(max_length=1, choices=SKIP_DIRECTIONS_CHOICES, verbose_name='скип движется')
     mixer = models.CharField(max_length=1, choices=MIXER_STATUS_CHOICES, verbose_name='выпускной тракт')
 
-    def __unicode__(self):
+    def __str__(self):
         if self.name:
             return self.name
         else:
@@ -218,8 +218,8 @@ class Status(models.Model):
 
     class Meta:
         ordering = ['-date', ]
-        verbose_name = 'состояние РБУ'
-        verbose_name_plural = 'состояния РБУ'
+        verbose_name = 'статус РБУ'
+        verbose_name_plural = 'статусы РБУ'
 
 
 class UnloadingType(models.Model):

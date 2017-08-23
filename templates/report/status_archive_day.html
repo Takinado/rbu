@@ -1,0 +1,133 @@
+{% extends 'report/base.html' %}
+{% load bootstrap3 %}
+{% load staticfiles %}
+
+{% block title %}{{ title }}{% endblock %}
+{#{% block content %}#}
+{% block main_content %}
+    <h1>{{ title }}</h1>
+    {% if day %}
+        <p>{{ day }}</p>
+    {% endif %}
+    {% if error_count %}
+        <p>Ошибок в файлах за день: {{ error_count }}</p>
+    {% endif %}
+
+    {% if is_paginated %}
+        {% bootstrap_pagination page_obj %}
+    {% endif %}
+{#    <div>#}
+{#        {% if is_paginated %}#}
+{#          <ul class="pagination">#}
+{#            {% if page_obj.has_previous %}#}
+{#              <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>#}
+{#            {% else %}#}
+{#              <li class="disabled"><span>&laquo;</span></li>#}
+{#            {% endif %}#}
+{#            {% for i in paginator.page_range %}#}
+{#              {% if page_obj.number == i %}#}
+{#                <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>#}
+{#              {% else %}#}
+{#                <li><a href="?page={{ i }}">{{ i }}</a></li>#}
+{#              {% endif %}#}
+{#            {% endfor %}#}
+{#            {% if page_obj.has_next %}#}
+{#              <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>#}
+{#            {% else %}#}
+{#              <li class="disabled"><span>&raquo;</span></li>#}
+{#            {% endif %}#}
+{#          </ul>#}
+{#        {% endif %}#}
+{#    </div>#}
+
+    <table class="table table-striped table-hover table-condensed stat" style="font-size: 12px">
+            <thead>
+            <tr>
+                <th colspan="3">Параметры</th>
+                <th colspan="4">Индикаторы</th>
+                <th colspan="4">Миксер</th>
+                <th colspan="1">Скип</th>
+                <th>блоки</th>
+                <th>инфо</th>
+            </tr>
+            <tr>
+                <th>№</th>
+                <th>Дата</th>
+                <th>img</th>
+                <th>химия</th>
+                <th>вода</th>
+                <th>цемент</th>
+                <th>Смесь</th>
+{#                <th>песок</th>#}
+                <th>Х</th>
+                <th>В</th>
+                <th>Ц</th>
+                <th>Щ</th>
+                <th>Щ</th>
+                <th>блоки</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for status in status_list %}
+            <tr{% if not status.no_error %} class='error'{% endif %}>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ status.date|date:'d-m-y H:i:s' }}</td>
+                <td><a href="{% static status.img.url %}">{{ status.get_img }}</a></td>
+                <td{% if status.vents1.is_him_in %} class='active_him'{% endif %}>{{ status.him1 }}</td>
+                <td{% if status.vents1.is_water_in %} class='active_water'{% endif %}>{{ status.water }}</td>
+                <td{% if status.vents1.is_cement_in %} class='active_cement'{% endif %}>{{ status.cement }}</td>
+                <td{% if status.vents1.is_breakstone_in or status.vents1.is_sand_in %} class='active_breakstone'{% endif %}>{{ status.breakstone1 }}</td>
+{#                <td{% if status.vents1.is_sand_in %} class='active_sand'{% endif %}>{{ status.sand }}</td>#}
+                <td{% if status.vents2.him %} class='active_him'{% endif %}>{{ status.mix_him }}</td>
+                <td{% if status.vents2.water %} class='active_water'{% endif %}>{{ status.mix_water }}</td>
+                <td{% if status.vents2.cement %} class='active_cement'{% endif %}>{{ status.mix_cement }}</td>
+                <td>{{ status.mix_breakstone }}</td>
+{#                <td>{{ status.mix_sand }}</td>#}
+                <td{% if status.vents2.composite %} class='active_breakstone'{% endif %}>{{ status.skip_breakstone }}</td>
+{#                <td{% if status.vents2.composite %} class='active_sand'{% endif %}>{{ status.skip_sand }}</td>#}
+{#                <td{% if status.vents1.is_breakstone_in %} class='active_breakstone'{% endif %}>{{ status.storage_breakstone }}</td>#}
+{#                <td{% if status.vents1.is_sand_in %} class='active_sand'{% endif %}>{{ status.storage_sand }}</td>#}
+
+                <td>{{ status.rbu_statuses }}</td>
+                {% if status.rbu_statuses.mixer == 'O' %}<td class='open_mixer'>
+                {% elif status.rbu_statuses.mixer == 'M' %}<td class='middle_mixer'>
+                    {% else %} <td>
+                {% endif %}
+                    {% if status.rbu_statuses.cem_bunker_active == 'R' %}
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                    {% elif status.rbu_statuses.cem_bunker_active == 'L' %}
+                        <span class="glyphicon glyphicon-chevron-left"></span>
+                    {% endif %}
+
+                    {% if status.rbu_statuses.skip == 'F' %}
+                        <span class="glyphicon glyphicon-cloud"></span>
+                    {% endif %}
+                    {% if status.rbu_statuses.skip_directions == 'U' %}
+                        <span class="glyphicon glyphicon-arrow-up"></span>
+                    {% elif status.rbu_statuses.skip_directions == 'D' %}
+                        <span class="glyphicon glyphicon-arrow-down"></span>
+                    {% endif %}
+                    {% if status.warning %}
+                        <span class="glyphicon glyphicon-warning-sign"></span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+
+<p>
+    {% if previous_day %}
+        Предидущий день: {{ previous_day }}
+    {% endif %}
+    {% if previous_day and next_day %}--{% endif %}
+    {% if next_day %}
+        Следующий день: {{ next_day }}
+    {% endif %}
+</p>
+
+
+{% endblock %}
