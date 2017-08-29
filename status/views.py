@@ -134,7 +134,6 @@ def pars(path):
             vents1=in_vents,
             vents2=out_vents,
             rbu_statuses=rbu_status
-
         )
         if created:
             c += 1
@@ -155,6 +154,34 @@ def pars(path):
     f.close()
     # print status_arr
     return i, c, e, status_arr
+
+
+def import_one_csv():
+    i = 0
+    total_n = 0
+    total_c = 0
+    total_e = 0
+    files = os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in'))
+    if files:
+        f = files[0]
+    # for f in os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in')):
+        if f.endswith('.csv'):
+            i += 1
+            print(f)
+            n, c, e, statuses = pars(os.path.join(settings.MEDIA_ROOT, 'import_in', f))
+            total_n += n
+            total_c += c
+            total_e += e
+            try:
+                pass
+                # path.rename(base.MEDIA_ROOT.child('stat_arh').child(path.name))
+                os.rename(
+                    os.path.join(settings.MEDIA_ROOT, 'import_in', f),
+                    os.path.join(settings.MEDIA_ROOT, 'import_arh', f),
+                )
+            except OSError as exc:
+                print(exc.strerror)
+    info = {'reads': total_n, 'inserts': total_c, 'errors': total_e}
 
 
 def import_csv(request):
