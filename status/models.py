@@ -3,7 +3,7 @@ from django.db import models
 from unload.models import Unload
 
 
-class InVents(models.Model):
+class InVent(models.Model):
     # name = models.CharField(max_length=127, blank=True, null=True, verbose_name='имя')
     vent1 = models.BooleanField(verbose_name='химия1')
     vent2 = models.BooleanField(verbose_name='химия2')
@@ -46,7 +46,7 @@ class InVents(models.Model):
         verbose_name_plural = 'состояния наполнительных вентилей'
 
 
-class OutVents(models.Model):
+class OutVent(models.Model):
     name = models.CharField(max_length=127, blank=True, null=True, verbose_name='имя')
     him = models.BooleanField(verbose_name='химия')
     water = models.BooleanField(verbose_name='вода')
@@ -141,8 +141,8 @@ class Status(models.Model):
     img = models.ImageField(verbose_name='картинка')
     no_error = models.BooleanField(default=False, verbose_name='без ошибок')
 
-    vents1 = models.ForeignKey(InVents, verbose_name='Впускные вентили')
-    vents2 = models.ForeignKey(OutVents, verbose_name='Выпускные вентили')
+    vents1 = models.ForeignKey(InVent, verbose_name='Впускные вентили')
+    vents2 = models.ForeignKey(OutVent, verbose_name='Выпускные вентили')
     rbu_statuses = models.ForeignKey(RbuStatus, verbose_name='Состояние блоков')
     warning = models.BooleanField(default=False, verbose_name='Предупреждение')
 

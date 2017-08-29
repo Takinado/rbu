@@ -14,7 +14,7 @@ from django.views.generic.dates import MonthMixin
 from rbu import settings
 
 from .forms import ImportForm, ToDoForm
-from .models import InVents, OutVents, RbuStatus, Status
+from .models import InVent, OutVent, RbuStatus, Status
 
 import calendar
 # Create your views here.
@@ -89,7 +89,7 @@ def pars(path):
         )
         # print('rbu ', created)
 
-        in_vents, created = InVents.objects.get_or_create(
+        in_vents, created = InVent.objects.get_or_create(
             vent1=char_to_bool(line[13]),
             vent2=char_to_bool(line[14]),
             vent3=char_to_bool(line[15]),
@@ -107,7 +107,7 @@ def pars(path):
             )
         # print('invents ', created, invents)
 
-        out_vents, created = OutVents.objects.get_or_create(
+        out_vents, created = OutVent.objects.get_or_create(
             him=char_to_bool(line[9]),
             water=char_to_bool(line[10]),
             cement=char_to_bool(line[11]),

@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from django.contrib.admin import ModelAdmin
 
-from .models import Status, RbuStatus, InVents, OutVents
+from .models import Status, RbuStatus, InVent, OutVent
 
 
 class StatusAdmin(ModelAdmin):
@@ -74,14 +74,14 @@ class InVentsAdmin(ModelAdmin):
     list_per_page = 40
 
     class Meta:
-        model = InVents
+        model = InVent
 
 
 class OutVentsAdmin(ModelAdmin):
     class Meta:
-        model = OutVents
+        model = OutVent
 
 admin.site.register(Status, StatusAdmin)
 admin.site.register(RbuStatus, RbuStatusAdmin)
-admin.site.register(InVents, InVentsAdmin)
-admin.site.register(OutVents, OutVentsAdmin)
+admin.site.register(InVent, InVentsAdmin)
+admin.site.register(OutVent, OutVentsAdmin)
