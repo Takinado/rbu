@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 
-from .models import Unload, UnloadType
+from .models import Unload, UnloadType, Carrier
 
 
 class UnloadingAdmin(ModelAdmin):
@@ -26,4 +26,5 @@ class UnloadingTypeAdmin(ModelAdmin):
         model = UnloadType
 
 admin.site.register(Unload, UnloadingAdmin)
-admin.site.register(UnloadType, UnloadingTypeAdmin)
+admin.site.register(UnloadType)
+admin.site.register(Carrier)

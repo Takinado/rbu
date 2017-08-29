@@ -27,7 +27,7 @@ app.conf.beat_schedule = {
 
     'add-every-5-seconds': {
         'task': 'task_import_csv',
-        'schedule': 5.0
+        'schedule': 15.0
     },
 
 }

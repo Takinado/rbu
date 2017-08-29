@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
 
-class ReportConfig(AppConfig):
-    name = 'report'
+class StatusAppConfig(AppConfig):
+    name = 'status'
+    verbose_name = "Статусы состояния"  # А здесь, имя которое необходимо отобразить в админке

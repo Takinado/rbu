@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 import random
 from rbu.celery import app
-from report.views import import_one_csv
+from status.views import import_one_csv
 
 from rbu import settings
 
