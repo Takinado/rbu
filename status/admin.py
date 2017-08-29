@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from django.contrib.admin import ModelAdmin
 
-from .models import Status, RbuStatus, InVents, OutVents, Unloading, UnloadingType
+from .models import Status, RbuStatus, InVents, OutVents
 
 
 class StatusAdmin(ModelAdmin):
@@ -81,31 +81,7 @@ class OutVentsAdmin(ModelAdmin):
     class Meta:
         model = OutVents
 
-
-class UnloadingAdmin(ModelAdmin):
-    date_hierarchy = 'date'
-    list_display = (
-        'date',
-        'type',
-        'him',
-        'water',
-        'cement',
-        'breakstone',
-        'sand',
-    )
-    ordering = ('date',)
-
-    class Meta:
-        model = Unloading
-
-
-class UnloadingTypeAdmin(ModelAdmin):
-    class Meta:
-        model = UnloadingType
-
 admin.site.register(Status, StatusAdmin)
 admin.site.register(RbuStatus, RbuStatusAdmin)
 admin.site.register(InVents, InVentsAdmin)
 admin.site.register(OutVents, OutVentsAdmin)
-admin.site.register(Unloading, UnloadingAdmin)
-admin.site.register(UnloadingType, UnloadingTypeAdmin)

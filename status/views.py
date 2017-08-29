@@ -13,15 +13,18 @@ from django.views.generic.dates import MonthMixin
 
 from rbu import settings
 
-from .forms import ImportForm
+from .forms import ImportForm, ToDoForm
 from .models import InVents, OutVents, RbuStatus, Status
 
+import calendar
 # Create your views here.
 
 
 def report_index(request):
     now = datetime.datetime.now()
 
+    c = calendar.HTMLCalendar()
+    html_out = c.formatmonth(datetime.datetime.today().year, datetime.datetime.today().month)
     # now.year = '2017'
     # now.month = '7'
     # now.day = '29'
@@ -38,7 +41,7 @@ def report_index(request):
     except ObjectDoesNotExist:
         print(type(status))
 
-    context = {'status': status, 'now': now}
+    context = {'status': status, 'now': now, 'calendar': html_out}
     return render(request, 'report/index.html', context)
 
 
@@ -220,7 +223,7 @@ def import_csv(request):
         form = ImportForm(initial={'file': context['file']})
     context['form'] = form
     # print(context)
-    return render(request, 'report/import.html', context)
+    return render(request, 'status/import.html', context)
 
 
 def ajax_test(request):
@@ -274,4 +277,12 @@ def status_day_view(request, year=None, month=None, day=None):
 
     context = {'status_list': statuses,
                }
-    return render(request, 'report/status_archive_day.html', context)
+    return render(request, 'status/status_archive_day.html', context)
+
+
+def test_page(request):
+    if request.method == 'GET':
+        form = ToDoForm()
+    else:
+        form = ToDoForm(request.POST)
+    return render(request, "report/template.html", dict(form=form))

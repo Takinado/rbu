@@ -60,3 +60,12 @@ class ImportForm(forms.Form):
 
             # all good
         return True
+
+
+from bootstrap3_datetime.widgets import DateTimePicker
+
+
+class ToDoForm(forms.Form):
+    todo = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
+    date = forms.DateField(widget=DateTimePicker(options={"format": "YYYY-MM-DD"}))
+    reminder = forms.DateTimeField(required=False, widget=DateTimePicker(options={"format": "YYYY-MM-DD HH:mm"}))

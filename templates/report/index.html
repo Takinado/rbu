@@ -3,6 +3,8 @@
 {% block main_content %}
     <h1 class="page-header">Сводка</h1>
 
+    {{ calendar|safe }}
+
     <h2>Последний статус {{ status.date }}</h2>
 
     <div class="row placeholders">

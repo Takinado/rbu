@@ -38,8 +38,11 @@ INSTALLED_APPS = [
 
     'debug_toolbar',
     'bootstrap3',
+    'bootstrap3_datetime',
 
-    'report',
+    'unload',
+    'status',
+
 ]
 
 MIDDLEWARE = [
