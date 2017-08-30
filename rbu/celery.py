@@ -25,9 +25,9 @@ def debug_task(self):
 # http://docs.celeryproject.org/en/latest/userguide/periodic-tasks.html
 app.conf.beat_schedule = {
 
-    'add-every-5-seconds': {
+    'add-every-30-seconds': {
         'task': 'task_import_csv',
-        'schedule': 15.0
+        'schedule': 30.0
     },
 
 }

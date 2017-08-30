@@ -5,6 +5,7 @@ celery==4.1.0
 Django==1.11.4
 django-appconf==1.0.2
 django-bootstrap3==9.0.0
+django-bootstrap3-datetimepicker-2==2.5.0
 django-celery-beat==1.0.1
 django-celery-results==1.0.1
 django-compressor==2.1.1
@@ -19,6 +20,7 @@ pytz==2017.2
 rcssmin==1.0.6
 redis==2.10.6
 rjsmin==1.0.12
+selenium==3.5.0
 simplejson==3.11.1
 six==1.10.0
 sqlparse==0.2.3
