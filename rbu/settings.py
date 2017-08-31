@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'bootstrap3',
     'bootstrap3_datetime',
 
-    'unload',
-    'status',
+    'unloads',
+    'statuses',
 
 ]
 

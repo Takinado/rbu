@@ -1,6 +1,6 @@
 from django.db import models
 
-from unload.models import Unload
+from unloads.models import Unload
 
 
 class InVent(models.Model):

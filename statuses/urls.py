@@ -18,6 +18,8 @@ urlpatterns = [
         name="status_list_view"),
 
     url(r'^test/$', test_page),
+
+    # url(r'^statuses/$', 'statuses.views.statuses'),
 ]
 
 # import_csv status_view_day unload_day_create cement_report

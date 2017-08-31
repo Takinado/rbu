@@ -313,3 +313,7 @@ def test_page(request):
     else:
         form = ToDoForm(request.POST)
     return render(request, "report/template.html", dict(form=form))
+
+
+def statuses():
+    pass
