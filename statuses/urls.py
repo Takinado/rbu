@@ -4,6 +4,7 @@ from .views import report_index, test_page
 from .views import ajax_test, get_more_tables
 from .views import StatusDayView
 from .views import import_csv
+from .views import statuses
 
 urlpatterns = [
     url(r'^$', report_index, name='report_index'),
@@ -18,8 +19,6 @@ urlpatterns = [
         name="status_list_view"),
 
     url(r'^test/$', test_page),
-
-    # url(r'^statuses/$', 'statuses.views.statuses'),
 ]
 
 # import_csv status_view_day unload_day_create cement_report

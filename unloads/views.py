@@ -1,3 +1,6 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+# def unload_list_view(request):
+def unload_list_view():
+    pass

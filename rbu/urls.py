@@ -22,6 +22,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('statuses.urls')),
+    url(r'^unload/', include('unloads.urls')),
 ]
 
 if settings.DEBUG:

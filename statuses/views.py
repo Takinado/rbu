@@ -7,7 +7,7 @@ import simplejson
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, render_to_response
 from django.views.generic import DayArchiveView
 from django.views.generic.dates import MonthMixin
 
@@ -42,7 +42,7 @@ def report_index(request):
         print(type(status))
 
     context = {'status': status, 'now': now, 'calendar': html_out}
-    return render(request, 'report/index.html', context)
+    return render(request, 'reports/index.html', context)
 
 
 def char_to_bool(ch):
@@ -250,7 +250,7 @@ def import_csv(request):
         form = ImportForm(initial={'file': context['file']})
     context['form'] = form
     # print(context)
-    return render(request, 'status/import.html', context)
+    return render(request, 'statuses/import.html', context)
 
 
 def ajax_test(request):
@@ -269,7 +269,7 @@ def get_more_tables(request):
     increment = int(request.GET['append_increment'])
     increment_to = increment + 10
     order = Status.objects.all().order_by('-id')[increment:increment_to]
-    return render(request, 'report/get_more_tables.html', {'order': order})
+    return render(request, 'reports/get_more_tables.html', {'order': order})
 
 
 class StatusDayView(DayArchiveView, MonthMixin):
@@ -304,7 +304,7 @@ def status_day_view(request, year=None, month=None, day=None):
 
     context = {'status_list': statuses,
                }
-    return render(request, 'status/status_archive_day.html', context)
+    return render(request, 'statuses/status_archive_day.html', context)
 
 
 def test_page(request):
@@ -312,8 +312,8 @@ def test_page(request):
         form = ToDoForm()
     else:
         form = ToDoForm(request.POST)
-    return render(request, "report/template.html", dict(form=form))
+    return render(request, "reports/template.html", dict(form=form))
 
 
-def statuses():
-    pass
+def statuses(request):
+    return render_to_response('statuses/statuses.html')

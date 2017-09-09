@@ -41,7 +41,7 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="{% url 'report_index' %}">Сводка</a></li>
+                    <li><a href="/{% url 'report_index' %}">Сводка</a></li>
                     <li><a href="#">Settings</a></li>
                     <li><a href="#">Profile</a></li>
                     <li><a href="#">Help</a></li>
@@ -67,7 +67,8 @@
                 </ul>
                 <ul class="nav nav-sidebar">
                     <li><a href="mixers">Машины</a></li>
-                    <li><a href="unloads">Выгрузки</a></li>
+                    <li><a id="unload-list-link" href="/unload/unload_list/">Выгрузки</a></li>
+{#                    <li><a id="unload-list-link" href="{% url 'unload_list_view' %}">Выгрузки</a></li>#}
                     {% url 'status_list_view' now.year now.month now.day as the_url %}
                     <li><a id="status-list" href="{{ the_url }}">Статусы</a></li>
                     <li><a href="files">Файлы</a></li>
