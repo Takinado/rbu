@@ -1,0 +1,29 @@
+{% extends 'reports/base.html' %}
+{% load bootstrap3 %}
+{% load staticfiles %}
+
+{% block title %}
+    Выгрузки
+{#    {{ title }}#}
+{% endblock %}
+{#{% block content %}#}
+{% block main_content %}
+    <h1>Выгрузки</h1>
+{#    <h1>{{ title }}</h1>#}
+
+    <form class="form-inline" role="form">
+        <div class="row">
+            <div class="form-group col-xs-4">
+                <label class="sr-only" for="unload-date">Дата</label>
+                <input type="date" class="form-control" id="unload-date" placeholder="22.03.1981">
+                <button type="submit" class="btn btn-default">Показать</button>
+            </div>
+        </div>
+    </form>
+
+<div class="unload-search-result"></div>
+<div class="unload-search-result"></div>
+<div class="unload-search-result"></div>
+
+{% endblock %}
+

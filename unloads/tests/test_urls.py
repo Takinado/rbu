@@ -13,5 +13,5 @@ class UnloadsURLTestCase(TestCase):
         """
 
         # brand_element = self.browser.find_element_by_css_selector('#unload-list-link')
-        root = resolve('/unload/unload_list/')
+        root = resolve('/unload/')
         self.assertEqual(root.func, unload_list_view)
