@@ -15,15 +15,20 @@
         <div class="row">
             <div class="form-group col-xs-4">
                 <label class="sr-only" for="unload-date">Дата</label>
-                <input type="date" class="form-control" id="unload-date" placeholder="22.03.1981">
+                <input type="date" class="form-control" id="unload-date" name="date" placeholder="22.03.1981">
                 <button type="submit" class="btn btn-default">Показать</button>
             </div>
         </div>
     </form>
 
-<div class="unload-search-result"></div>
-<div class="unload-search-result"></div>
-<div class="unload-search-result"></div>
+    {% for unload in unloads %}
+    <div class="unload-row">
+        date:{{ unload.date }},
+        him:{{ unload.him }},
+        water:{{ unload.water }},
+        cement:{{ unload.cement }}
+    </div>
+    {% endfor %}
 
 {% endblock %}
 
