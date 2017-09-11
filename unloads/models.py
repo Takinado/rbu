@@ -26,7 +26,8 @@ class UnloadType(models.Model):
 
 
 class Unload(models.Model):
-    date = models.DateTimeField(verbose_name='дата')
+    date = models.DateField(verbose_name='дата')
+    # start_time = models.TimeField(verbose_name='время начала')
     type = models.ForeignKey(UnloadType, blank=True, null=True, verbose_name='тип')
     value = models.FloatField(null=True, default=None, verbose_name='объем')
     him = models.FloatField(default=0, verbose_name='химия')
@@ -43,14 +44,25 @@ class Unload(models.Model):
         verbose_name_plural = 'отгрузки'
 
     def __str__(self):
-        return self.date.strftime("%d.%m.%Y %H:%M:%S")
+        # return self.date.strftime("%d.%m.%Y %H:%M:%S")
+        return '{} #{}'.format(
+            self.date.strftime("%d.%m.%Y"),
+            self.id
+        )
 
     def mess(self):
-        return 'Отгрузка: %s, Хим: %s, вода: %s, цемент: %s, смесь: %s' % (self,
-                                                                           self.him,
-                                                                           self.water,
-                                                                           self.cement,
-                                                                           self.breakstone)
+        return 'Отгрузка: {}, Хим: {}, вода: {}, цемент: {}, смесь: {}'.format(
+            self,
+            self.him,
+            self.water,
+            self.cement,
+            self.breakstone
+        )
+        # return 'Отгрузка: %s, Хим: %s, вода: %s, цемент: %s, смесь: %s' % (self,
+        #                                                                    self.him,
+        #                                                                    self.water,
+        #                                                                    self.cement,
+        #                                                                    self.breakstone)
 
 
 class CarrierManager(models.Manager):

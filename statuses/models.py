@@ -1,7 +1,5 @@
 from django.db import models
 
-from unloads.models import Unload
-
 
 class InVent(models.Model):
     # name = models.CharField(max_length=127, blank=True, null=True, verbose_name='имя')
@@ -155,7 +153,7 @@ class Status(models.Model):
     skip_sand = models.SmallIntegerField(default=0, verbose_name='песок в скипе')
     storage_breakstone = models.SmallIntegerField(default=0, verbose_name='щебень в накопителе')
     storage_sand = models.SmallIntegerField(default=0, verbose_name='песок в накопителе')
-    unload = models.ForeignKey(Unload, blank=True, null=True, verbose_name='Выгрузка')
+    unload = models.ForeignKey('unloads.Unload', blank=True, null=True, verbose_name='Выгрузка')
     is_processed = models.BooleanField(default=False, verbose_name='Обработан')
 
     # add our custom model manager

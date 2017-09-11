@@ -64,7 +64,6 @@ class UnloadsTestCase(LiveServerTestCase):
         # self.assertGreater(len(search_results), 1)
         self.assertEqual(len(search_results), 1)
 
-
         # Можно выбрать дату и отправить запрос
         date_input.send_keys('01.09.2017')
         # date_input.submit()
@@ -75,10 +74,60 @@ class UnloadsTestCase(LiveServerTestCase):
         self.assertGreater(len(search_results), 1)
 
         # Можно выбрать отгрузку
+        search_results[0].click()
 
-        # Страница отгрузки
+        # На странице отгрузки увидеть дату,тип отгрузки, объём,
+        # количество компонентов, активный бункер и машину
+
+        self.assertEqual(
+            self.browser.current_url,
+            '{}/unload/3/'.format(self.live_server_url)
+        )
+
+        self.assertEqual(
+            self.browser.find_element_by_css_selector('#unload-date').text,
+            '01.09.2017'
+        )
+        self.assertEqual(
+            self.browser.find_element_by_css_selector('#unload-type').text,
+            ''
+        )
+        self.assertEqual(
+            self.browser.find_element_by_css_selector('#unload-value').text,
+            ''
+        )
+        self.assertEqual(
+            self.browser.find_element_by_css_selector('#unload-him').text,
+            '4'
+        )
+        self.assertEqual(
+            self.browser.find_element_by_css_selector('#unload-water').text,
+            '150'
+        )
+        self.assertEqual(
+            self.browser.find_element_by_css_selector('#unload-cement').text,
+            '300'
+        )
+        self.assertEqual(
+            self.browser.find_element_by_css_selector('#unload-breakstone').text,
+            ''
+        )
+        self.assertEqual(
+            self.browser.find_element_by_css_selector('#unload-sand').text,
+            ''
+        )
+        self.assertEqual(
+            self.browser.find_element_by_css_selector('#unload-is_active_left_bunker').text,
+            ''
+        )
+        self.assertEqual(
+            self.browser.find_element_by_css_selector('#unload-carrier').text,
+            ''
+        )
 
         self.fail('Весь тест пока не выполняется')
+
+        # а также начальное и конечное время, перечень приклеплённых статусов
 
     def tearDown(self):
         self.browser.quit()
