@@ -1,6 +1,7 @@
 import datetime
 
 from django.shortcuts import render_to_response
+from django.views.generic import DetailView
 
 from .models import Unload
 
@@ -26,3 +27,7 @@ def unload_list_view(request):
         context = {'unloads': unloads_queryset}
 
     return render_to_response('unloads/unloads_list_view.html', context)
+
+
+class UnloadDetailView(DetailView):
+    model = Unload
