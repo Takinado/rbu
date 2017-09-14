@@ -15,15 +15,32 @@ class UnloadBaseTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
         cls.unload1 = Unload.objects.create(
             date=datetime.date(2017, 9, 1),
-            him=4,
+            him=4.0,
+            water=100,
             cement=400,
+            breakstone=1280,
+            sand=700,
+            is_active_left_bunker=True,
         )
+
         cls.unload2 = Unload.objects.create(
             date=datetime.datetime.strptime('02.09.2017', '%d.%m.%Y').date(),
-            water=150,
-            cement=200,
+            him=3,
+            water=150.0,
+            cement=200.0,
+            breakstone=1000,
+            sand=500,
+            is_active_left_bunker=False,
+        )
+
+        cls.unload3 = Unload.objects.create(
+            date=datetime.date(2017, 9, 1),
+            him=0,
+            water=80,
+            is_active_left_bunker=True,
         )
 
 
@@ -57,7 +74,7 @@ class IndexUnloadViewTestCase(UnloadBaseTestCase):
         unloads = response.context['unloads']
 
         self.assertIs(type(unloads), QuerySet)
-        self.assertEqual(len(unloads), 1)
+        self.assertGreaterEqual(len(unloads), 1)
         self.assertEqual(unloads[0].him, 4)
 
 

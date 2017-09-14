@@ -23,10 +23,12 @@
 
     {% for unload in unloads %}
     <div class="unload-row">
-        date:{{ unload.date }},
-        him:{{ unload.him }},
-        water:{{ unload.water }},
-        cement:{{ unload.cement }}
+        <a href="/unload/{{ unload.pk }}">
+            date:{{ unload.date }},
+            him:{{ unload.him }},
+            water:{{ unload.water }},
+            cement:{{ unload.cement }}
+        </a>
     </div>
     {% endfor %}
 

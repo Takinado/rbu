@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from django.db import models
 
 
 class InVent(models.Model):
-    # name = models.CharField(max_length=127, blank=True, null=True, verbose_name='имя')
+    name = models.CharField(max_length=127, blank=True, null=True, verbose_name='имя')
     vent1 = models.BooleanField(verbose_name='химия1')
     vent2 = models.BooleanField(verbose_name='химия2')
     vent3 = models.BooleanField(verbose_name='химия3')
@@ -17,12 +19,13 @@ class InVent(models.Model):
     vent12 = models.BooleanField(verbose_name='песок2')
     vent13 = models.BooleanField(verbose_name='щебень3')
     vent14 = models.BooleanField(verbose_name='щебень4')
+    description = models.TextField(blank=True, null=True, verbose_name='описание')
 
-    # def __str__(self):
-    #     if self.name:
-    #         return self.name
-    #     else:
-    #         return 'new'
+    def __str__(self):
+        if self.name:
+            return self.name
+        else:
+            return 'Состояние #{}'.format(self.pk)
 
     def is_him_in(self):
         return self.vent1 or self.vent2 or self.vent3 or self.vent4
@@ -50,12 +53,18 @@ class OutVent(models.Model):
     water = models.BooleanField(verbose_name='вода')
     cement = models.BooleanField(verbose_name='цемент')
     composite = models.BooleanField(verbose_name='смесь')
+    description = models.TextField(blank=True, null=True, verbose_name='описание')
 
     def __str__(self):
         if self.name:
             return self.name
         else:
-            return str(self.him) + ';' + str(self.water) + ';' + str(self.cement) + ';' + str(self.composite)
+            return '{};{};{};{}'.format(
+                str(self.him),
+                str(self.water),
+                str(self.cement),
+                str(self.composite)
+            )
 
     class Meta:
         verbose_name = 'состояние выпускных вентилей'
@@ -100,18 +109,20 @@ class RbuStatus(models.Model):
     skip = models.CharField(max_length=1, choices=SKIP_STATUS_CHOICES, verbose_name='Скип')
     skip_directions = models.CharField(max_length=1, choices=SKIP_DIRECTIONS_CHOICES, verbose_name='скип движется')
     mixer = models.CharField(max_length=1, choices=MIXER_STATUS_CHOICES, verbose_name='выпускной тракт')
+    description = models.TextField(blank=True, null=True, verbose_name='описание')
 
     def __str__(self):
         if self.name:
             return self.name
         else:
-            return ';'.join([self.cem_bunker_active,
-                             self.cem_bunker1,
-                             self.cem_bunker2,
-                             self.skip,
-                             self.skip_directions,
-                             self.mixer
-                             ])
+            return '{}{}{} {}{} {}'.format(
+                self.cem_bunker_active,
+                self.cem_bunker1,
+                self.cem_bunker2,
+                self.skip,
+                self.skip_directions,
+                self.mixer
+            )
 
     class Meta:
         verbose_name = 'состояние блоков'
@@ -126,9 +137,18 @@ class RbuStatus(models.Model):
 #         return self.filter(no_error=False, **kwargs)
 
 
+def char_to_bool(ch):
+    if ch == 'C':
+        return False
+    elif ch == 'O':
+        return True
+    else:
+        return False
+
+
 class Status(models.Model):
-    # name = models.CharField(max_length=127, blank=True, null=True, verbose_name='имя')
-    date = models.DateTimeField(verbose_name='дата')
+    date = models.DateField(verbose_name='дата')
+    time = models.TimeField(verbose_name='время')
     him1 = models.FloatField(verbose_name='химия1')
     him2 = models.FloatField(verbose_name='химия2')
     water = models.FloatField(verbose_name='вода')
@@ -199,6 +219,72 @@ class Status(models.Model):
         else:
             return 0
 
+    @staticmethod
+    def add(line):
+        status = Status()
+        status.date = datetime.strptime(line[0].split()[0], '%d.%m.%Y').date()
+        status.time = datetime.strptime(line[0].split()[1], '%H:%M:%S').time()
+        status.him1 = line[1]
+        status.him2 = line[2]
+        status.water = line[3]
+        status.cement = line[4]
+        status.breakstone1 = line[5]
+        status.sand = line[6]
+        status.breakstone2 = line[7]
+        status.img = line[8]
+
+        rbu_status, created = RbuStatus.objects.get_or_create(
+            cem_bunker_active=line[27],
+            cem_bunker1=line[28],
+            cem_bunker2=line[29],
+            skip=line[30],
+            skip_directions=line[31],
+            mixer=line[32]
+        )
+
+        in_vents, created = InVent.objects.get_or_create(
+            vent1=char_to_bool(line[13]),
+            vent2=char_to_bool(line[14]),
+            vent3=char_to_bool(line[15]),
+            vent4=char_to_bool(line[16]),
+            vent5=char_to_bool(line[17]),
+            vent6=char_to_bool(line[18]),
+            vent7=char_to_bool(line[19]),
+            vent8=char_to_bool(line[20]),
+            vent9=char_to_bool(line[21]),
+            vent10=char_to_bool(line[22]),
+            vent11=char_to_bool(line[23]),
+            vent12=char_to_bool(line[24]),
+            vent13=char_to_bool(line[25]),
+            vent14=char_to_bool(line[26]),
+            )
+
+        out_vents, created = OutVent.objects.get_or_create(
+            him=char_to_bool(line[9]),
+            water=char_to_bool(line[10]),
+            cement=char_to_bool(line[11]),
+            composite=not char_to_bool(line[12])
+        )
+
+        status, created = Status.objects.get_or_create(
+            date=status.date,
+            time=status.time,
+            him1=float(line[1]) / 100,
+            him2=float(line[2]) / 100,
+            water=float(line[3]) / 10,
+            cement=float(line[4]) / 10,
+            breakstone1=int(line[5]),
+            sand=int(line[6]),
+            breakstone2=int(line[7]),
+            no_error=False if 'e' in line[:30] else True,
+            warning=True if line[1] != line[2] or line[5] != line[6] or line[5] != line[7] else False,
+            img=line[8],
+            vents1=in_vents,
+            vents2=out_vents,
+            rbu_statuses=rbu_status
+        )
+        return status, created
+
     @property
     def get_img_shortname(self):
         return self.img.path.split('\\')[-1]
@@ -212,7 +298,7 @@ class Status(models.Model):
         return True
 
     def __str__(self):
-        return self.date.strftime("%d.%m.%Y %H:%M:%S")
+        return '{} {}'.format(self.date.strftime("%d.%m.%Y"), self.time.strftime("%H:%M:%S"))
 
     class Meta:
         ordering = ['-date', ]
@@ -227,7 +313,7 @@ class LoadBunker(models.Model):
     is_valid = models.BooleanField(default=False, verbose_name='Подтверждена')
 
     def __str__(self):
-        return self.status_curr.date.strftime("%d.%m.%Y %H:%M:%S")
+        return self.status_curr.date.strftime("%d.%m.%Y")
 
     class Meta:
         unique_together = ("status_prev", "status_curr")

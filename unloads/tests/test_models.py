@@ -12,11 +12,20 @@ class UnloadModelTestCase(TestCase):
         self.unload = Unload.objects.create(
             # date=timezone.now(),
             date=datetime.date(2017, 9, 1),
-            cement=400,
+            him=3.5,
+            water=100,
+            cement=300,
+            breakstone=1280,
+            sand=700,
+            is_active_left_bunker=True,
         )
 
     def test_unload_basic(self):
         """
         Test the basic functionality of Unload
         """
-        self.assertEqual(self.unload.cement, 400)
+        self.assertEqual(self.unload.cement, 300)
+        self.assertEqual(
+            self.unload.date,
+            datetime.datetime.strptime('01.09.2017', '%d.%m.%Y').date(),
+        )

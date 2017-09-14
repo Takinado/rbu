@@ -1,3 +1,20 @@
 {% extends 'reports/base.html' %}
 {% load bootstrap3 %}
 {% load staticfiles %}
+
+{% block title %}
+    Выгрузка {{ unload.date }} #{{ unload.pk }}
+{% endblock %}
+
+{% block main_content %}
+    <h1>Выгрузка от <span id="unload-date">{{ unload.date|date:"d.m.Y" }}</span> #{{ unload.pk }}</h1>
+    <p>Тип отгрузки: <span id="unload-type">{{ unload.type }}</span></p>
+    <p>Кубатура: <span id="unload-value">{{ unload.value }}</span></p>
+    <p>Химикатов: <span id="unload-him">{{ unload.him }}</span></p>
+    <p>Воды: <span id="unload-water">{{ unload.water }}</span></p>
+    <p><b>Цемента: <span id="unload-cement">{{ unload.cement }}</span></b></p>
+    <p>Наполнителя: <span id="unload-breakstone">{{ unload.breakstone }}</span></p>
+    <p>Песка: <span id="unload-sand">{{ unload.sand }}</span></p>
+    <p>Цемент из <span id="unload-is_active_left_bunker">{{ unload.is_active_left_bunker }}</span> бункера</p>
+    <p>Машина: <span id="unload-carrier">{{ unload.carrier }}</span></p>
+{% endblock %}

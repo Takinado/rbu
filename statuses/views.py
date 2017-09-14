@@ -1,8 +1,5 @@
 import os
-import time
-import datetime
-import pytz
-# import unipath
+from datetime import datetime
 import simplejson
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -20,19 +17,25 @@ import calendar
 # Create your views here.
 
 
+def status_list_view(request):
+    today = datetime.today().date()
+    # today = datetime.datetime.strptime('07.08.2017', '%d.%m.%Y').date()
+    return redirect('status_list_view', year=today.year, month=today.month, day=today.day)
+
+
 def report_index(request):
-    now = datetime.datetime.now()
+    now = datetime.now()
 
     c = calendar.HTMLCalendar()
-    html_out = c.formatmonth(datetime.datetime.today().year, datetime.datetime.today().month)
+    html_out = c.formatmonth(datetime.today().year, datetime.today().month)
     # now.year = '2017'
     # now.month = '7'
     # now.day = '29'
 
     now = {
         'year': 2017,
-        'month': 7,
-        'day': 29
+        'month': 8,
+        'day': 7
     }
 
     status = Status()
@@ -43,15 +46,6 @@ def report_index(request):
 
     context = {'status': status, 'now': now, 'calendar': html_out}
     return render(request, 'reports/index.html', context)
-
-
-def char_to_bool(ch):
-    if ch == 'C':
-        return False
-    elif ch == 'O':
-        return True
-    else:
-        return False
 
 
 def pars(path):
@@ -68,73 +62,9 @@ def pars(path):
     for line in f:
         i += 1
         line = line[0:-1].split(',')
-        status = Status()
-        status.date = line[0]
-        status.him1 = line[1]
-        status.him2 = line[2]
-        status.water = line[3]
-        status.cement = line[4]
-        status.breakstone1 = line[5]
-        status.sand = line[6]
-        status.breakstone2 = line[7]
-        status.img = line[8]
-        # x = line[30]
-        rbu_status, created = RbuStatus.objects.get_or_create(
-            cem_bunker_active=line[27],
-            cem_bunker1=line[28],
-            cem_bunker2=line[29],
-            skip=line[30],
-            skip_directions=line[31],
-            mixer=line[32]
-        )
-        # print('rbu ', created)
 
-        in_vents, created = InVent.objects.get_or_create(
-            vent1=char_to_bool(line[13]),
-            vent2=char_to_bool(line[14]),
-            vent3=char_to_bool(line[15]),
-            vent4=char_to_bool(line[16]),
-            vent5=char_to_bool(line[17]),
-            vent6=char_to_bool(line[18]),
-            vent7=char_to_bool(line[19]),
-            vent8=char_to_bool(line[20]),
-            vent9=char_to_bool(line[21]),
-            vent10=char_to_bool(line[22]),
-            vent11=char_to_bool(line[23]),
-            vent12=char_to_bool(line[24]),
-            vent13=char_to_bool(line[25]),
-            vent14=char_to_bool(line[26]),
-            )
-        # print('invents ', created, invents)
+        status, created = Status.add(line)
 
-        out_vents, created = OutVent.objects.get_or_create(
-            him=char_to_bool(line[9]),
-            water=char_to_bool(line[10]),
-            cement=char_to_bool(line[11]),
-            composite=not char_to_bool(line[12])
-        )
-
-        # time.strptime - делает из строки time.struct_time
-        # time.mktime - возвращает timestamp из time.struct_time
-        # datetime.fromtimestamp - делает из timestamp datetime
-
-        status, created = Status.objects.get_or_create(
-            date=pytz.utc.localize(datetime.datetime.fromtimestamp(time.mktime(time.strptime(line[0],
-                                                                                             "%d.%m.%Y %H:%M:%S")))),
-            him1=float(line[1]) / 100,
-            him2=float(line[2]) / 100,
-            water=float(line[3]) / 10,
-            cement=float(line[4]) / 10,
-            breakstone1=int(line[5]),
-            sand=int(line[6]),
-            breakstone2=int(line[7]),
-            no_error=False if 'e' in line[:30] else True,
-            warning=True if line[1] != line[2] or line[5] != line[6] or line[5] != line[7] else False,
-            img=line[8],
-            vents1=in_vents,
-            vents2=out_vents,
-            rbu_statuses=rbu_status
-        )
         if created:
             c += 1
         if not status.no_error:
@@ -156,7 +86,7 @@ def pars(path):
     return i, c, e, status_arr
 
 
-def import_one_csv():
+def import_one_csv(debug=False):
     i = 0
     total_n = 0
     total_c = 0
@@ -172,16 +102,21 @@ def import_one_csv():
             total_n += n
             total_c += c
             total_e += e
-            try:
-                pass
-                # path.rename(base.MEDIA_ROOT.child('stat_arh').child(path.name))
-                os.rename(
-                    os.path.join(settings.MEDIA_ROOT, 'import_in', f),
-                    os.path.join(settings.MEDIA_ROOT, 'import_arh', f),
-                )
-            except OSError as exc:
-                print(exc.strerror)
+
+            if not debug:
+                try:
+                    pass
+                    # path.rename(base.MEDIA_ROOT.child('stat_arh').child(path.name))
+                    os.rename(
+                        os.path.join(settings.MEDIA_ROOT, 'import_in', f),
+                        os.path.join(settings.MEDIA_ROOT, 'import_arh', f),
+                    )
+                except OSError as exc:
+                    print(exc.strerror)
+
     info = {'reads': total_n, 'inserts': total_c, 'errors': total_e}
+    if debug:
+        print(info)
 
 
 def import_csv(request):
@@ -285,7 +220,7 @@ class StatusDayView(DayArchiveView, MonthMixin):
 
 
 def status_day_view(request, year=None, month=None, day=None):
-    now = datetime.datetime.now()
+    now = datetime.now()
     year = '2017'
     month = '7'
     day = '29'
@@ -313,7 +248,3 @@ def test_page(request):
     else:
         form = ToDoForm(request.POST)
     return render(request, "reports/template.html", dict(form=form))
-
-
-def statuses(request):
-    return render_to_response('statuses/statuses.html')

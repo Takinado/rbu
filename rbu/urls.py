@@ -19,9 +19,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+from statuses.views import report_index
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^', include('statuses.urls')),
+    url(r'^$', report_index, name='report_index'),
+    url(r'^status/', include('statuses.urls')),
     url(r'^unload/', include('unloads.urls')),
 ]
 
