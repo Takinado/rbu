@@ -24,7 +24,7 @@ class StatusTestCase(LiveServerTestCase):
             'C', 'C', 'C', 'O', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C',
             'L', 'N', 'H', 'N', 'e', 'C'
         ]
-        Status.add(line)
+        self.status1, created = Status.create(line)
 
     def find_search_results(self):
         return self.browser.find_elements_by_css_selector('.status-row a')
@@ -80,12 +80,21 @@ class StatusTestCase(LiveServerTestCase):
             '{}/status/3'.format(self.live_server_url)
         )
 
+        try:
+            brand_element = self.browser.find_element_by_css_selector('.navbar-brand')
+        except NoSuchElementException:
+            return self.fail('Не открывается страница Статуса. На странице не найден элемент ".navbar-brand"')
+
         self.assertEqual(
             self.browser.find_element_by_css_selector('#status-date').text,
             '07.08.2017'
         )
 
         # self.fail('Весь тест пока не выполняется')
+
+    def test_pars_cem_bunker_active(self):
+        self.assertEqual(self.status1.rbu_statuses.cem_bunker_active,
+                         'L')
 
     def tearDown(self):
         self.browser.quit()

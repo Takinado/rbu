@@ -220,7 +220,7 @@ class Status(models.Model):
             return 0
 
     @staticmethod
-    def add(line):
+    def create(line):
         status = Status()
         status.date = datetime.strptime(line[0].split()[0], '%d.%m.%Y').date()
         status.time = datetime.strptime(line[0].split()[1], '%H:%M:%S').time()

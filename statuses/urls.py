@@ -1,13 +1,13 @@
 from django.conf.urls import url
 
-from .views import status_list_view, test_page
+from .views import index_statuses_view, test_page
 from .views import ajax_test, get_more_tables
 from .views import StatusDayView
 from .views import import_csv
 
 urlpatterns = [
     # url(r'^$', unload_list_view, name='report_index'),
-    url(r'^$', status_list_view, name='status_index'),
+    url(r'^$', index_statuses_view, name='status_index'),
     # csv
     url(r'^import_csv/$', import_csv, name='import_csv'),
     url(r'^ajax_test/$', ajax_test),

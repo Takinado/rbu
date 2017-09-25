@@ -5,7 +5,7 @@ import simplejson
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, render_to_response
-from django.views.generic import DayArchiveView
+from django.views.generic import DayArchiveView, DetailView
 from django.views.generic.dates import MonthMixin
 
 from rbu import settings
@@ -17,9 +17,8 @@ import calendar
 # Create your views here.
 
 
-def status_list_view(request):
+def index_statuses_view(request):
     today = datetime.today().date()
-    # today = datetime.datetime.strptime('07.08.2017', '%d.%m.%Y').date()
     return redirect('status_list_view', year=today.year, month=today.month, day=today.day)
 
 
@@ -52,7 +51,7 @@ def pars(path):
     """
     Импорт csv-файла в базу
     :param path:
-    :return:
+    :return: список строк кратких описаний статусов
     """
     f = open(path, 'r')
     i = 0
@@ -63,7 +62,7 @@ def pars(path):
         i += 1
         line = line[0:-1].split(',')
 
-        status, created = Status.add(line)
+        status, created = Status.create(line)
 
         if created:
             c += 1
@@ -71,6 +70,7 @@ def pars(path):
             e += 1
             print(line[8])
         status_arr.append([
+            line[0],
             float(line[1]) / 100,
             float(line[2]) / 100,
             float(line[3]) / 10,
@@ -87,6 +87,12 @@ def pars(path):
 
 
 def import_one_csv(debug=False):
+    """
+
+    :param debug:
+    :return: список строк кратких описаний статусов
+    """
+    statuses = []
     i = 0
     total_n = 0
     total_c = 0
@@ -117,6 +123,8 @@ def import_one_csv(debug=False):
     info = {'reads': total_n, 'inserts': total_c, 'errors': total_e}
     if debug:
         print(info)
+
+    return statuses
 
 
 def import_csv(request):
@@ -219,32 +227,13 @@ class StatusDayView(DayArchiveView, MonthMixin):
     # template_name = 'report/status_list.html'
 
 
-def status_day_view(request, year=None, month=None, day=None):
-    now = datetime.now()
-    year = '2017'
-    month = '7'
-    day = '29'
-    if not year:
-        year = now.year
-    if not month:
-        month = now.month
-    if not day:
-        day = now.day
-    statuses = Status.objects.filter(
-                date__year=year,
-                date__month=month,
-                date__day=day
-            ).order_by('date')
-    print(statuses)
-
-    context = {'status_list': statuses,
-               }
-    return render(request, 'statuses/status_archive_day.html', context)
-
-
 def test_page(request):
     if request.method == 'GET':
         form = ToDoForm()
     else:
         form = ToDoForm(request.POST)
     return render(request, "reports/template.html", dict(form=form))
+
+
+class StatusDetailView(DetailView):
+    pass
