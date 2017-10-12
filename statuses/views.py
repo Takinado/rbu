@@ -236,4 +236,20 @@ def test_page(request):
 
 
 class StatusDetailView(DetailView):
-    pass
+    model = Status
+
+
+def select_status_day(request):
+    """
+    Редирект на страницу нужного дня
+    :param request:
+    :return:
+    """
+    if 'date' in request.GET:
+        date = request.GET['date']
+        d = datetime.strptime(date, '%d.%m.%Y')
+        return redirect('status_list_view', year=d.year, month=d.month, day=d.day)
+
+    # TODO Убрать этот костыль. Сделать Проверку введённых данных - в обработчике формы после MVP
+    # ([0-2]\d|3[01])\.(0\d|1[012])\.(\d{4})
+    # https://djbook.ru/forum/topic/2471/

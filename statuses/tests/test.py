@@ -64,7 +64,7 @@ class StatusTestCase(LiveServerTestCase):
 
         # И увидеть результат... статусы за дату
         search_results = self.find_search_results()
-        self.assertGreater(len(search_results), 1)
+        self.assertEqual(len(search_results), 2)
 
         # Можно выбрать статус
         search_results[0].click()
@@ -77,7 +77,7 @@ class StatusTestCase(LiveServerTestCase):
 
         self.assertEqual(
             self.browser.current_url,
-            '{}/status/3'.format(self.live_server_url)
+            '{}/status/3/'.format(self.live_server_url)
         )
 
         try:

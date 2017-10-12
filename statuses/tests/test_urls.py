@@ -1,10 +1,10 @@
 from django.test import TestCase
 from django.core.urlresolvers import resolve
 
-from statuses.views import index_statuses_view, StatusDayView
+from statuses.views import index_statuses_view, StatusDayView, StatusDetailView
 
 
-class UnloadsURLTestCase(TestCase):
+class StatusURLTestCase(TestCase):
 
     def test_root_url_uses_unload_list_view(self):
         """
@@ -22,15 +22,13 @@ class UnloadsURLTestCase(TestCase):
         self.assertEquals(found.func.__name__, StatusDayView.__name__)
         self.assertEquals(found.func.view_class, StatusDayView)
 
-    # def test_status_details_url(self):
-    #     """
-    #     Тест что URL от StatusDetail обрабатывается правильной функцией
-    #     :return:
-    #     """
-    #     status_detail = resolve('/status/1/')
-    #
-    #     self.assertEqual(
-    #         status_detail.func.__name__,
-    #         'StatusDetailView'
-    #     )
-    #     self.assertEqual(status_detail.kwargs['pk'], '1')
+    def test_status_details_url(self):
+        """
+        Тест что URL от StatusDetail обрабатывается правильной функцией
+        :return:
+        """
+        status_detail = resolve('/status/3/')
+
+        self.assertEquals(status_detail.func.__name__, StatusDetailView.__name__)
+        self.assertEquals(status_detail.func.view_class, StatusDetailView)
+        self.assertEqual(status_detail.kwargs['pk'], '3')

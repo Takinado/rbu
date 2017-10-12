@@ -2,8 +2,9 @@ from django.conf.urls import url
 
 from .views import index_statuses_view, test_page
 from .views import ajax_test, get_more_tables
-from .views import StatusDayView
+from .views import StatusDayView, StatusDetailView
 from .views import import_csv
+from .views import select_status_day
 
 urlpatterns = [
     # url(r'^$', unload_list_view, name='report_index'),
@@ -17,6 +18,9 @@ urlpatterns = [
     url(r'^(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$',
         StatusDayView.as_view(),
         name="status_list_view"),
+    url(r'form/$', select_status_day, name="select_status_day"),
+
+    url(r'^(?P<pk>\d+)/$', StatusDetailView.as_view(), name='status-detail'),
 
     url(r'^test/$', test_page),
 ]
