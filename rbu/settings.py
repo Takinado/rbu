@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 
     'unloads',
     'statuses',
+    'reports',
 
 ]
 

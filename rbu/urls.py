@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^$', report_index, name='report_index'),
     url(r'^status/', include('statuses.urls')),
     url(r'^unload/', include('unloads.urls')),
+    url(r'^report/', include('reports.urls')),
 ]
 
 if settings.DEBUG:
