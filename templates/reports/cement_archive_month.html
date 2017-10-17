@@ -13,11 +13,12 @@
 
   <ul>
     {% for cement in object_list %}
-        <li class="cement-li">{{ cement.date|date:"j F" }}: {{ cement.value }}</li>
+        <li class="cement-li">{{ cement.date|date:"j F" }}: <span class="cement-value">{{ cement.value }}</span></li>
     {% endfor %}
 </ul>
 <p>
-Всего {{ total.value__sum }} кг. цемента за {{ object_list|length }} рабочих суток.
+    Всего <span id="total-value">{{ total.value__sum }}</span> кг. цемента
+    за <span id="total-day">{{ object_list|length }}</span> рабочих суток.
 </p>
 <div>
     {% if previous_month %}
