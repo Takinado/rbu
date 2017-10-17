@@ -1,12 +1,11 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from django.test import LiveServerTestCase
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
-from statuses.models import Status
-from statuses.views import import_one_csv
+from reports.models import Cement
 
 
 class ReportTestCase(LiveServerTestCase):
@@ -15,19 +14,10 @@ class ReportTestCase(LiveServerTestCase):
         self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(2)
 
-        import_one_csv(debug=True)
-
-        fulldate = datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S")
-        line = [
-            fulldate, '0', '0', '0', '0', '0', '0', '0',
-            'BETONPC-beton-Log_file(2017-08-07_10-38-52)_files\\I42954_4381442708.jpg',
-            'C', 'C', 'C', 'O', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C',
-            'L', 'N', 'H', 'N', 'e', 'C'
-        ]
-        self.status1, created = Status.create(line)
+        cement1 = Cement.objects.create_cement(date.today(), 100)
 
     def find_search_results(self):
-        return self.browser.find_elements_by_css_selector('.status-row a')
+        return self.browser.find_elements_by_css_selector('.cement-li')
 
     def test_view_report(self):
         """
@@ -44,21 +34,10 @@ class ReportTestCase(LiveServerTestCase):
 
         self.assertEqual('РБУ', brand_element.text)
 
-        # На странице форма с выбором даты
-        date_input = self.browser.find_element_by_css_selector(
-            'input#report-date'
-        )
-        self.assertIsNotNone(self.browser.find_element_by_css_selector(
-            'label[for="report-date"]'))
-        self.assertEqual(date_input.get_attribute('placeholder'),
-                         '07.08.2017')
+        # На странице список Цементов за текущий месяц
+        search_results = self.find_search_results()
+        self.assertGreaterEqual(len(search_results), 1)
 
-        #
-        # # и общим списком статусов за сегодня
-        # search_results = self.find_search_results()
-        # # self.assertEqual(len(search_results), 1)
-        # self.assertGreaterEqual(len(search_results), 1)
-        #
         # # Можно выбрать дату и отправить запрос
         # date_input.send_keys('07.08.2017')
         # self.browser.find_element_by_css_selector('form button').click()

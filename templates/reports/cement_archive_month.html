@@ -1,0 +1,35 @@
+{% extends 'reports/base.html' %}
+{% load bootstrap3 %}
+{% load staticfiles %}
+
+{% block title %}Цемент за месяц{% endblock %}
+{#{% block content %}#}
+{% block main_content %}
+    <h1>Отчет по цементу за {{ month|date:"F Y" }}</h1>
+
+    {% if is_paginated %}
+        {% bootstrap_pagination page_obj %}
+    {% endif %}
+
+  <ul>
+    {% for cement in object_list %}
+        <li class="cement-li">{{ cement.date|date:"j F" }}: {{ cement.value }}</li>
+    {% endfor %}
+</ul>
+<p>
+Всего {{ total.value__sum }} кг. цемента за {{ object_list|length }} рабочих суток.
+</p>
+<div>
+    {% if previous_month %}
+        <a class="btn btn-primary" href="{% url 'report_cement_month' previous_month.year previous_month.month %}">
+            <span class="glyphicon glyphicon-arrow-left"></span> {{ previous_month|date:"F Y" }}
+        </a>
+    {% endif %}
+    {% if next_month %}
+        <a class="btn btn-primary" href="{% url 'report_cement_month' next_month.year next_month.month %}">
+            {{ next_month|date:"F Y" }} <span class="glyphicon glyphicon-arrow-right"></span>
+        </a>
+    {% endif %}
+</div>
+
+{% endblock %}

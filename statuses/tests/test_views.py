@@ -71,7 +71,7 @@ class IndexUnloadViewTestCase(StatusBaseTestCase):
         with self.assertTemplateUsed('statuses/status_archive_day.html'):
             response.render()
 
-        response2 = StatusDayView.as_view()(request, year=year, month=month , day=day)
+        response2 = StatusDayView.as_view()(request, year=year, month=month, day=day)
         self.assertEqual(response2.status_code, 200)
 
         response3 = StatusDayView.as_view()(request, year=year, month=month, day=day)
