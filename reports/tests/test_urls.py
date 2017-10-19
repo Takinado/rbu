@@ -1,12 +1,17 @@
-from django.test import TestCase
+from datetime import datetime
+
+from django.test import TestCase, RequestFactory
 from django.core.urlresolvers import resolve
 
-from reports.views import report_cement_index
+from reports.views import report_cement_index, CementMonthArchiveView
 
 
 class ReportURLTestCase(TestCase):
 
-    def test_root_url_uses_unload_list_view(self):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_root_url_uses_cement_report_view(self):
         """
         Отчет по цементу обрабатывается правильной функцией
         """

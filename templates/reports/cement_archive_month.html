@@ -22,12 +22,12 @@
 </p>
 <div>
     {% if previous_month %}
-        <a class="btn btn-primary" href="{% url 'report_cement_month' previous_month.year previous_month.month %}">
+        <a id="prev" class="btn btn-primary" href="{% url 'report_cement_month' previous_month.year previous_month.month %}">
             <span class="glyphicon glyphicon-arrow-left"></span> {{ previous_month|date:"F Y" }}
         </a>
     {% endif %}
     {% if next_month %}
-        <a class="btn btn-primary" href="{% url 'report_cement_month' next_month.year next_month.month %}">
+        <a id="next" class="btn btn-primary" href="{% url 'report_cement_month' next_month.year next_month.month %}">
             {{ next_month|date:"F Y" }} <span class="glyphicon glyphicon-arrow-right"></span>
         </a>
     {% endif %}

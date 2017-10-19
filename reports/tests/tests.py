@@ -53,11 +53,18 @@ class ReportTestCase(LiveServerTestCase):
         self.assertEqual(int(total_value), sum(map(int, cement_values)))
 
         # есть ссылка и можно перейти на прошлый месяц
+        try:
+            prev_month = self.browser.find_element_by_css_selector('#prev')
+        except NoSuchElementException:
+            return self.fail('Нет ссылки #prev на прошлый месяц')
 
         # c прошлого есть ссылка и можно перейти снова на текущий
+        # try:
+        #     next_month = self.browser.find_element_by_css_selector('#next')
+        # except NoSuchElementException:
+        #     return self.fail('Нет ссылки #next на следующий месяц')
 
-
-        self.fail('Весь тест пока не выполняется')
+        # self.fail('Весь тест пока не выполняется')
 
     def tearDown(self):
         self.browser.quit()
