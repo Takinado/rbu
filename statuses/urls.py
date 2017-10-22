@@ -3,14 +3,14 @@ from django.conf.urls import url
 from .views import index_statuses_view, test_page
 from .views import ajax_test, get_more_tables
 from .views import StatusDayView, StatusDetailView
-from .views import import_csv
+from .views import import_csv_view
 from .views import select_status_day
 
 urlpatterns = [
     # url(r'^$', unload_list_view, name='report_index'),
     url(r'^$', index_statuses_view, name='status_index'),
     # csv
-    url(r'^import_csv/$', import_csv, name='import_csv'),
+    url(r'^import_csv/$', import_csv_view, name='import_csv'),
     url(r'^ajax_test/$', ajax_test),
     url(r'^ajax_test2/$', get_more_tables, name='get_more_tables'),
 

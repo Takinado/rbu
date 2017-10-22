@@ -127,7 +127,17 @@ def import_one_csv(debug=False):
     return statuses
 
 
-def import_csv(request):
+def import_all_csv():
+    files = os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in'))
+    print(files)
+    for path in files:
+        if path.endswith('.csv'):
+            print(path)
+            i, c, e, statuses = pars(os.path.join(settings.MEDIA_ROOT, 'import_in', path))
+            print('reads:{}, inserts:{}, errors:{}'.format(i, c, e))
+    return True
+
+def import_csv_view(request):
     files = os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in'))
     # files = os.listdir(settings.MEDIA_ROOT.child('import_in'))
     context = {'file': '', 'lines_sum': 0}
@@ -224,6 +234,7 @@ class StatusDayView(DayArchiveView, MonthMixin):
     allow_future = True
     month_format = '%m'
     paginate_by = 200
+    allow_empty = True
     # template_name = 'report/status_list.html'
 
 

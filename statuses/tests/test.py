@@ -6,7 +6,7 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
 from statuses.models import Status
-from statuses.views import import_one_csv
+from statuses.views import import_all_csv
 
 
 class StatusTestCase(LiveServerTestCase):
@@ -15,7 +15,7 @@ class StatusTestCase(LiveServerTestCase):
         self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(2)
 
-        import_one_csv(debug=True)
+        import_all_csv()
 
         fulldate = datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S")
         line = [
@@ -63,7 +63,7 @@ class StatusTestCase(LiveServerTestCase):
         self.browser.find_element_by_css_selector('form button').click()
 
         # И увидеть результат... статусы за дату
-        search_results = self.find_search_results()
+        search_results = self.browser.find_elements_by_css_selector('.status-row td:nth-child(2) a')
         self.assertEqual(len(search_results), 2)
 
         # Можно выбрать статус
@@ -77,7 +77,7 @@ class StatusTestCase(LiveServerTestCase):
 
         self.assertEqual(
             self.browser.current_url,
-            '{}/status/3/'.format(self.live_server_url)
+            '{}/status/12/'.format(self.live_server_url)
         )
 
         try:
@@ -87,7 +87,7 @@ class StatusTestCase(LiveServerTestCase):
 
         self.assertEqual(
             self.browser.find_element_by_css_selector('#status-date').text,
-            '07.08.2017'
+            '07.08.17'
         )
 
         # self.fail('Весь тест пока не выполняется')

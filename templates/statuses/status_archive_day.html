@@ -129,16 +129,21 @@
         </tbody>
     </table>
 
-
-<p>
+<div>
     {% if previous_day %}
-        Предидущий день: {{ previous_day }}
+        <a id="prev" class="btn btn-primary"
+           href="{% url 'status_list_view' previous_day.year previous_day.month previous_day.day %}">
+            <span class="glyphicon glyphicon-arrow-left"></span> {{ previous_day|date:"d F Y" }}
+        </a>
     {% endif %}
-    {% if previous_day and next_day %}--{% endif %}
     {% if next_day %}
-        Следующий день: {{ next_day }}
+        <a id="next" class="btn btn-primary"
+           href="{% url 'status_list_view' next_day.year next_day.month next_day.day %}">
+            {{ next_day|date:"d F Y" }} <span class="glyphicon glyphicon-arrow-right"></span>
+        </a>
     {% endif %}
-</p>
+</div>
+
 
 
 {% endblock %}

@@ -16,22 +16,18 @@ class StatusBaseTestCase(TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        fulldate = datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S")
-        line = [
-            fulldate, '0', '0', '0', '0', '0', '0', '0',
-            'BETONPC-beton-Log_file(2017-08-07_10-38-52)_files\\I42954_4381442708.jpg',
-            'C', 'C', 'C', 'O', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C',
-            'L', 'N', 'H', 'N', 'e', 'C'
-        ]
-        cls.status1, created = Status.create(line)
-
-        print(cls.status1)
-
-        statuses = import_one_csv(debug=True)
-        # print(statuses[0])
-        # print(statuses[1])
-        # cls.status2, created = Status.create(statuses[0])
-        # cls.status3, created = Status.create(statuses[1])
+        # fulldate = datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S")
+        # line = [
+        #     fulldate, '0', '0', '0', '0', '0', '0', '0',
+        #     'BETONPC-beton-Log_file(2017-08-07_10-38-52)_files\\I42954_4381442708.jpg',
+        #     'C', 'C', 'C', 'O', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C',
+        #     'L', 'N', 'H', 'N', 'e', 'C'
+        # ]
+        # cls.status1, created = Status.create(line)
+        #
+        # print(cls.status1)
+        #
+        # statuses = import_one_csv(debug=True)
 
 
 class IndexUnloadViewTestCase(StatusBaseTestCase):
