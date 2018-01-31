@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.test import LiveServerTestCase
-
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
@@ -11,6 +10,7 @@ from statuses.views import import_all_csv
 
 class StatusTestCase(LiveServerTestCase):
 
+    # запускается для каждого теста
     def setUp(self):
         self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(2)
@@ -90,11 +90,15 @@ class StatusTestCase(LiveServerTestCase):
             '07.08.17'
         )
 
-        # self.fail('Весь тест пока не выполняется')
-
-    def test_pars_cem_bunker_active(self):
+        # проверка что активный бункер левый
         self.assertEqual(self.status1.rbu_statuses.cem_bunker_active,
                          'L')
+
+        # self.fail('Весь тест пока не выполняется')
+
+    # def test_pars_cem_bunker_active(self):
+    #     self.assertEqual(self.status1.rbu_statuses.cem_bunker_active,
+    #                      'L')
 
     def tearDown(self):
         self.browser.quit()

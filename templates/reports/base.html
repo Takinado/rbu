@@ -25,81 +25,81 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body id="{% block body_id %}body{% endblock %}">
-    {% bootstrap_messages %}
+{% bootstrap_messages %}
 
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
-                        aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#">РБУ</a>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="/{% url 'report_index' %}">Сводка</a></li>
-                    <li><a href="#">Settings</a></li>
-                    <li><a href="#">Profile</a></li>
-                    <li><a href="#">Help</a></li>
-                </ul>
-                <form class="navbar-form navbar-right">
-                    <input type="text" class="form-control" placeholder="Поиск...">
-                </form>
-            </div>
-        </div>
-    </nav>
-
+<nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-3 col-md-2 sidebar">
-                <ul class="nav nav-sidebar">
-                    <li class="active">
-                        <a href="{% url 'report_index' %}">Сводка <span class="sr-only">(current)</span></a>
-                    </li>
-                    <li><a href="{% url 'report_cement_index' %}">Отчёт по цементу</a></li>
-                    <li><a href="#">Analytics</a></li>
-                    <li><a href="{% url 'import_csv' %}">Импорт</a></li>
-                    <li><a href="#">Export</a></li>
-                </ul>
-                <ul class="nav nav-sidebar">
-                    <li><a href="/mixers/">Машины</a></li>
-                    <li><a id="unload-list-link" href="/unload/">Выгрузки</a></li>
-{#                    <li><a id="unload-list-link" href="{% url 'unload_list_view' %}">Выгрузки</a></li>#}
-{#                    {% url 'status_list_view' now.year now.month now.day as the_url %}#}
-{#                    <li><a id="status-list" href="{{ the_url }}">Статусы</a></li>#}
-                    <li><a id="status-list" href="{% url 'status_index' %}">Статусы</a></li>
-                    <li><a href="/files/">Файлы</a></li>
-                </ul>
-                <ul class="nav nav-sidebar">
-                    <li><a href="">Nav item again</a></li>
-                    <li><a href="">One more nav</a></li>
-                    <li><a href="">Another nav item</a></li>
-                </ul>
-            </div>
-            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-
-                {% block main_content %}{% endblock main_content %}
-
-            </div>
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">РБУ</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/{% url 'report_index' %}">Сводка</a></li>
+                <li><a href="#">Settings</a></li>
+                <li><a href="#">Profile</a></li>
+                <li><a href="#">Help</a></li>
+            </ul>
+            <form class="navbar-form navbar-right">
+                <input type="text" class="form-control" placeholder="Поиск...">
+            </form>
         </div>
     </div>
+</nav>
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="{% static 'js/jquery.min.js' %}"><\/script>')</script>
-    {#<script src="js/bootstrap.min.js"></script>#}
-    {% bootstrap_javascript %}
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
-    {#<script src="{% static "js/custom.js"%}"></script>#}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li class="active">
+                    <a href="{% url 'report_index' %}">Сводка <span class="sr-only">(current)</span></a>
+                </li>
+                <li><a href="{% url 'report_cement_index' %}">Отчёт по цементу</a></li>
+                <li><a href="#">Analytics</a></li>
+                <li><a href="{% url 'import_csv' %}">Импорт</a></li>
+                <li><a href="#">Export</a></li>
+            </ul>
+            <ul class="nav nav-sidebar">
+                <li><a href="/mixers/">Машины</a></li>
+                <li><a id="unload-list-link" href="/unload/">Выгрузки</a></li>
+                {#                    <li><a id="unload-list-link" href="{% url 'unload_list_view' %}">Выгрузки</a></li>#}
+                {#                    {% url 'status_list_view' now.year now.month now.day as the_url %}#}
+                {#                    <li><a id="status-list" href="{{ the_url }}">Статусы</a></li>#}
+                <li><a id="status-list" href="{% url 'status_index' %}">Статусы</a></li>
+                <li><a href="/files/">Файлы</a></li>
+            </ul>
+            <ul class="nav nav-sidebar">
+                <li><a href="{% url 'status_month_calc' year='2017' month='09' %}">Рассчитать новые статусы</a></li>
+                <li><a href="">One more nav</a></li>
+                <li><a href="">Another nav item</a></li>
+            </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
-    {% block extra_footer_js %}{% endblock %}
+            {% block main_content %}{% endblock main_content %}
+
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="{% static 'js/jquery.min.js' %}"><\/script>')</script>
+{#<script src="js/bootstrap.min.js"></script>#}
+{% bootstrap_javascript %}
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+{#<script src="{% static "js/custom.js"%}"></script>#}
+
+{% block extra_footer_js %}{% endblock %}
 
 </body>
 </html>

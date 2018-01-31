@@ -257,7 +257,7 @@ class Status(models.Model):
             vent12=char_to_bool(line[24]),
             vent13=char_to_bool(line[25]),
             vent14=char_to_bool(line[26]),
-            )
+        )
 
         out_vents, created = OutVent.objects.get_or_create(
             him=char_to_bool(line[9]),

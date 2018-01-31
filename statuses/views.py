@@ -1,19 +1,19 @@
+import calendar
 import os
 from datetime import datetime
-import simplejson
 
+import simplejson
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
-from django.shortcuts import render, redirect, render_to_response
+from django.shortcuts import render, redirect
 from django.views.generic import DayArchiveView, DetailView
 from django.views.generic.dates import MonthMixin
 
 from rbu import settings
-
 from .forms import ImportForm, ToDoForm
-from .models import InVent, OutVent, RbuStatus, Status
+from .models import Status
 
-import calendar
+
 # Create your views here.
 
 
@@ -100,7 +100,7 @@ def import_one_csv(debug=False):
     files = os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in'))
     if files:
         f = files[0]
-    # for f in os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in')):
+        # for f in os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in')):
         if f.endswith('.csv'):
             i += 1
             print(f)
@@ -137,16 +137,19 @@ def import_all_csv():
             print('reads:{}, inserts:{}, errors:{}'.format(i, c, e))
     return True
 
+
 def import_csv_view(request):
     files = os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in'))
-    # files = os.listdir(settings.MEDIA_ROOT.child('import_in'))
     context = {'file': '', 'lines_sum': 0}
-    for f in files:
+
+    files.sort()
+
+    for f in files[::-1]:
         if f.endswith('.csv'):
             path = f
             lines_sum = sum(1 for l in open(os.path.join(settings.MEDIA_ROOT, 'import_in', f), 'r'))
             # lines_sum = sum(1 for l in open(settings.MEDIA_ROOT.child('import_in').child(f), 'r'))
-            context = {'file': f, 'lines_sum': lines_sum, 'remained': len(files)-1}
+            context = {'file': f, 'lines_sum': lines_sum, 'remained': len(files) - 1}
 
             # i, c, e, statuses = pars(os.path.join(settings.MEDIA_ROOT, 'stat_in', path))
             #
@@ -188,7 +191,7 @@ def import_csv_view(request):
                 print(exc.strerror)
 
             # тут бок небольшой
-                # TODO не обновляется страница после обработки файла
+            # TODO не обновляется страница после обработки файла
             return redirect('import_csv')
             # print context
             # redirect to a new URL:
@@ -196,8 +199,8 @@ def import_csv_view(request):
             # return HttpResponseRedirect('/stat/index/')
             # return render(request, 'betstat/index.html', context)
         # else:
-            # context['errors'] = form.errors.as_data()
-            # render(request, 'betstat/stat_add.html', context)
+        # context['errors'] = form.errors.as_data()
+        # render(request, 'betstat/stat_add.html', context)
     # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportForm(initial={'file': context['file']})
@@ -227,10 +230,10 @@ def get_more_tables(request):
 
 class StatusDayView(DayArchiveView, MonthMixin):
     # queryset = Status.objects.all()
-    queryset = Status.objects.all().select_related('rbu_statuses', 'vents1', 'vents2')\
+    queryset = Status.objects.all().select_related('rbu_statuses', 'vents1', 'vents2') \
         .filter(no_error=True)
     date_field = "date"
-    ordering = 'date'
+    ordering = 'time'
     allow_future = True
     month_format = '%m'
     paginate_by = 200
@@ -258,9 +261,121 @@ def select_status_day(request):
     """
     if 'date' in request.GET:
         date = request.GET['date']
-        d = datetime.strptime(date, '%d.%m.%Y')
+        d = datetime.strptime(date, '%Y-%m-%d')
         return redirect('status_list_view', year=d.year, month=d.month, day=d.day)
 
     # TODO Убрать этот костыль. Сделать Проверку введённых данных - в обработчике формы после MVP
     # ([0-2]\d|3[01])\.(0\d|1[012])\.(\d{4})
     # https://djbook.ru/forum/topic/2471/
+
+
+def status_month_calc(request, year=None, month=None):
+    # def statuses_calc(request):
+    for day in range(1, calendar.monthrange(2017, 9)[1] + 1):
+        print(day)
+        status_day_calc(request, year=year, month=month, day=day)
+
+
+def status_day_calc(request, year=None, month=None, day=None):
+    """
+    Расчет параметров статусов дня
+    :param request:
+    :param year:
+    :param month:
+    :param day:
+    :return:
+    """
+    if day is None:
+        status_list_full = Status.objects.select_related('rbu_statuses', 'vents1', 'vents2').filter(
+            date__year=year,
+            date__month=month
+        ).order_by('date')
+    else:
+        status_list_full = Status.objects.select_related('rbu_statuses', 'vents1', 'vents2').filter(
+            date__year=year,
+            date__month=month,
+            date__day=day
+        ).order_by('date')
+    error_count = status_list_full.filter(no_error=False).count()
+    status_list = status_list_full.filter(no_error=True).order_by('date')
+
+    if len(status_list) >= 1:
+        Status.objects.filter(id=status_list[0].id).update(is_processed=True)
+    if len(status_list) > 1:
+        for i in range(1, len(status_list)):
+            status_calc(status_list[i - 1], status_list[i])
+
+            Status.objects.filter(id=status_list[i].id).update(
+                mix_him=status_list[i].mix_him,
+                mix_water=status_list[i].mix_water,
+                mix_cement=status_list[i].mix_cement,
+                mix_breakstone=status_list[i].mix_breakstone,
+                mix_sand=status_list[i].mix_sand,
+                skip_breakstone=status_list[i].skip_breakstone,
+                skip_sand=status_list[i].skip_sand,
+                storage_breakstone=status_list[i].storage_breakstone,
+                storage_sand=status_list[i].storage_sand,
+                is_processed=True,
+            )
+
+    context = {'status_list': status_list,
+               'error_count': error_count,
+               'title': 'Расчет статусов за день'
+               }
+    return render(request, 'rbu/status_list.html', context)
+
+
+def status_calc(prev_status, status):
+    """
+    Вычисление параметров статуса
+    :param prev_status:
+    :param status:
+    :return:
+    """
+
+    # Химию в миксер
+    if status.vents2.him or prev_status.vents2.him:
+        status.mix_him = round(prev_status.him1 - status.him1 + prev_status.mix_him, 2)
+    else:
+        status.mix_him = prev_status.mix_him
+    # Воду в миксер
+    if status.vents2.water or prev_status.vents2.water:
+        status.mix_water = round(prev_status.water - status.water + prev_status.mix_water, 2)
+    else:
+        status.mix_water = prev_status.mix_water
+    # Цемент в миксер
+    if status.vents2.cement or prev_status.vents2.cement:
+        status.mix_cement = round(prev_status.cement - status.cement + prev_status.mix_cement, 2)
+    else:
+        status.mix_cement = prev_status.mix_cement
+    # Смесь в скип
+    if prev_status.vents2.composite:
+
+        delta = prev_status.breakstone1 - status.breakstone1
+        status.skip_breakstone = prev_status.skip_breakstone + delta
+    else:
+        status.skip_breakstone = prev_status.skip_breakstone
+    # Скип в миксер
+    if status.rbu_statuses.skip == 'N' and prev_status.rbu_statuses.skip == 'F':
+        status.mix_breakstone = prev_status.mix_breakstone + status.skip_breakstone
+        status.skip_breakstone = 0
+    else:
+        status.mix_breakstone = prev_status.mix_breakstone
+    # Выгрузка
+    if find_unload_in_statuses(prev_status, status):
+        status.mix_him = status.mix_water = status.mix_cement = status.mix_breakstone = status.mix_sand = 0
+
+    return status
+
+
+def find_unload_in_statuses(prev_status, status):
+    """
+    Поиск отгрузки
+    :param prev_status:
+    :param status:
+    :return:
+    """
+    if status.rbu_statuses.mixer == 'O' and prev_status.rbu_statuses.mixer != 'O':
+        if not prev_status.is_mix_empty:
+            return True
+    return False

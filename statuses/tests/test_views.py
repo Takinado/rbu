@@ -1,48 +1,48 @@
 from datetime import datetime
 
-from django.db.models import QuerySet
 from django.test import TestCase, RequestFactory
 
-from statuses.models import Status
-from statuses.views import index_statuses_view, StatusDayView, StatusDetailView, import_one_csv
+from statuses.views import index_statuses_view, StatusDayView
 
 
 class StatusBaseTestCase(TestCase):
+    pass
+
+    # def setUp(self):
+    #     self.factory = RequestFactory()
+    #
+    # @classmethod
+    # def setUpClass(cls):
+    #     super().setUpClass()
+    #
+    #     fulldate = datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S")
+    #     line = [
+    #         fulldate, '0', '0', '0', '0', '0', '0', '0',
+    #         'BETONPC-beton-Log_file(2017-08-07_10-38-52)_files\\I42954_4381442708.jpg',
+    #         'C', 'C', 'C', 'O', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C',
+    #         'L', 'N', 'H', 'N', 'e', 'C'
+    #     ]
+    #     cls.status1, created = Status.create(line)
+    #
+    #     print(cls.status1)
+    #
+    #     statuses = import_one_csv(debug=True)
+
+
+class IndexStatusViewTestCase(StatusBaseTestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        # fulldate = datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S")
-        # line = [
-        #     fulldate, '0', '0', '0', '0', '0', '0', '0',
-        #     'BETONPC-beton-Log_file(2017-08-07_10-38-52)_files\\I42954_4381442708.jpg',
-        #     'C', 'C', 'C', 'O', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C',
-        #     'L', 'N', 'H', 'N', 'e', 'C'
-        # ]
-        # cls.status1, created = Status.create(line)
-        #
-        # print(cls.status1)
-        #
-        # statuses = import_one_csv(debug=True)
-
-
-class IndexUnloadViewTestCase(StatusBaseTestCase):
-
-    def setUp(self):
-        self.factory = RequestFactory()
-        fulldate = datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S")
-        line = [
-            fulldate, '0', '0', '0', '0', '0', '0', '0',
-            'BETONPC-beton-Log_file(2017-08-07_10-38-52)_files\\I42954_4381442708.jpg',
-            'C', 'C', 'C', 'O', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C',
-            'L', 'N', 'H', 'N', 'e', 'C'
-        ]
-        self.status4, created = Status.create(line)
-        statuses = import_one_csv(debug=True)
+    #     fulldate = datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S")
+    #     line = [
+    #         fulldate, '0', '0', '0', '0', '0', '0', '0',
+    #         'BETONPC-beton-Log_file(2017-08-07_10-38-52)_files\\I42954_4381442708.jpg',
+    #         'C', 'C', 'C', 'O', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C',
+    #         'L', 'N', 'H', 'N', 'e', 'C'
+    #     ]
+    #     self.status4, created = Status.create(line)
+    #     statuses = import_one_csv(debug=True)
 
     def test_index_status_view_basic(self):
         """
@@ -110,7 +110,6 @@ class IndexUnloadViewTestCase(StatusBaseTestCase):
     #     self.assertIs(type(status_list), QuerySet)
     #     self.assertGreaterEqual(len(status_list), 1)
     #     self.assertEqual(status_list[0].him, 4)
-
 
 # class UnloadViewTestCase(StatusBaseTestCase):
 #
