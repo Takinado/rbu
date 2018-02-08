@@ -47,7 +47,7 @@ def report_index(request):
     return render(request, 'reports/index.html', context)
 
 
-def pars(path):
+def parsing_file_and_save_statuses_to_base(path):
     """
     Импорт csv-файла в базу
     :param path:
@@ -82,7 +82,6 @@ def pars(path):
             status.no_error
         ])
     f.close()
-    # print status_arr
     return i, c, e, status_arr
 
 
@@ -100,19 +99,17 @@ def import_one_csv(debug=False):
     files = os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in'))
     if files:
         f = files[0]
-        # for f in os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in')):
         if f.endswith('.csv'):
             i += 1
             print(f)
-            n, c, e, statuses = pars(os.path.join(settings.MEDIA_ROOT, 'import_in', f))
+            n, c, e, statuses = parsing_file_and_save_statuses_to_base(
+                os.path.join(settings.MEDIA_ROOT, 'import_in', f))
             total_n += n
             total_c += c
             total_e += e
 
             if not debug:
                 try:
-                    pass
-                    # path.rename(base.MEDIA_ROOT.child('stat_arh').child(path.name))
                     os.rename(
                         os.path.join(settings.MEDIA_ROOT, 'import_in', f),
                         os.path.join(settings.MEDIA_ROOT, 'import_arh', f),
@@ -133,7 +130,8 @@ def import_all_csv():
     for path in files:
         if path.endswith('.csv'):
             print(path)
-            i, c, e, statuses = pars(os.path.join(settings.MEDIA_ROOT, 'import_in', path))
+            i, c, e, statuses = parsing_file_and_save_statuses_to_base(
+                os.path.join(settings.MEDIA_ROOT, 'import_in', path))
             print('reads:{}, inserts:{}, errors:{}'.format(i, c, e))
     return True
 
@@ -148,22 +146,7 @@ def import_csv_view(request):
         if f.endswith('.csv'):
             path = f
             lines_sum = sum(1 for l in open(os.path.join(settings.MEDIA_ROOT, 'import_in', f), 'r'))
-            # lines_sum = sum(1 for l in open(settings.MEDIA_ROOT.child('import_in').child(f), 'r'))
             context = {'file': f, 'lines_sum': lines_sum, 'remained': len(files) - 1}
-
-            # i, c, e, statuses = pars(os.path.join(settings.MEDIA_ROOT, 'stat_in', path))
-            #
-            # try:
-            #     os.rename(
-            #         os.path.join(settings.MEDIA_ROOT, 'stat_in', path),
-            #         os.path.join(settings.MEDIA_ROOT, 'stat_arh', path)
-            #     )
-            # except OSError as exc:
-            #     print(exc.strerror)
-            #
-            # print(i, c, e)
-
-    # return render(request, 'betstat/stat_add.html', context)
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -175,37 +158,25 @@ def import_csv_view(request):
             cd = form.cleaned_data
             path = cd['file']
 
-            i, c, e, statuses = pars(os.path.join(settings.MEDIA_ROOT, 'import_in', path))
-            # i, c, e, statuses = pars(settings.MEDIA_ROOT.child('import_in').child(path))
+            i, c, e, statuses = parsing_file_and_save_statuses_to_base(
+                os.path.join(settings.MEDIA_ROOT, 'import_in', path))
             context['info'] = {'reads': i, 'inserts': c, 'errors': e}
             context['statuses'] = statuses
 
             try:
                 os.rename(
                     os.path.join(settings.MEDIA_ROOT, 'import_in', path),
-                    # settings.MEDIA_ROOT.child('import_in').child(path),
                     os.path.join(settings.MEDIA_ROOT, 'import_arh', path)
-                    # settings.MEDIA_ROOT.child('import_arh').child(path)
                 )
             except OSError as exc:
                 print(exc.strerror)
 
-            # тут бок небольшой
-            # TODO не обновляется страница после обработки файла
             return redirect('import_csv')
-            # print context
-            # redirect to a new URL:
-            # return HttpResponse(u'Файл: %s' % (cd['file']))
-            # return HttpResponseRedirect('/stat/index/')
-            # return render(request, 'betstat/index.html', context)
-        # else:
-        # context['errors'] = form.errors.as_data()
-        # render(request, 'betstat/stat_add.html', context)
+
     # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportForm(initial={'file': context['file']})
     context['form'] = form
-    # print(context)
     return render(request, 'statuses/import.html', context)
 
 

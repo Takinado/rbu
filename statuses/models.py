@@ -297,6 +297,13 @@ class Status(models.Model):
             return False
         return True
 
+    def calculate_status(self):
+        """
+        Calculate all parameters of status
+        :return:
+        """
+        previous_status = self.get_previous_by_date()
+
     def __str__(self):
         return '{} {}'.format(self.date.strftime("%d.%m.%Y"), self.time.strftime("%H:%M:%S"))
 
