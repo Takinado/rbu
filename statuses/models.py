@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime
 
 from django.db import models
@@ -146,7 +147,19 @@ def char_to_bool(ch):
         return False
 
 
+def parsing_csv(path):
+    lines = []
+    with open(path, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file)
+        for row in csv_reader:
+            lines.append(row)
+    return lines
+
+
 class Status(models.Model):
+    datetime = models.DateTimeField(verbose_name='дата', db_index=True)
+    created = models.DateTimeField(auto_now_add=True)
+    changed = models.DateTimeField(auto_now=True)
     date = models.DateField(verbose_name='дата')
     time = models.TimeField(verbose_name='время')
     him1 = models.FloatField(verbose_name='химия1')
@@ -224,6 +237,7 @@ class Status(models.Model):
         status = Status()
         status.date = datetime.strptime(line[0].split()[0], '%d.%m.%Y').date()
         status.time = datetime.strptime(line[0].split()[1], '%H:%M:%S').time()
+        status.datetime = datetime.combine(status.date, status.time)
         status.him1 = line[1]
         status.him2 = line[2]
         status.water = line[3]
@@ -267,6 +281,7 @@ class Status(models.Model):
         )
 
         status, created = Status.objects.get_or_create(
+            datetime=status.datetime,
             date=status.date,
             time=status.time,
             him1=float(line[1]) / 100,
@@ -283,7 +298,7 @@ class Status(models.Model):
             vents2=out_vents,
             rbu_statuses=rbu_status
         )
-        return status, created
+        return status, created, not status.no_error
 
     @property
     def get_img_shortname(self):
@@ -302,7 +317,13 @@ class Status(models.Model):
         Calculate all parameters of status
         :return:
         """
-        previous_status = self.get_previous_by_date()
+        # https://docs.djangoproject.com/en/1.11/ref/models/instances/#django.db.models.Model.get_previous_by_FOO
+        try:
+            previous_status = self.get_previous_by_datetime()
+        except Status.DoesNotExist:
+            return
+
+        return previous_status
 
     def __str__(self):
         return '{} {}'.format(self.date.strftime("%d.%m.%Y"), self.time.strftime("%H:%M:%S"))

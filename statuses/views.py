@@ -11,7 +11,7 @@ from django.views.generic.dates import MonthMixin
 
 from rbu import settings
 from .forms import ImportForm, ToDoForm
-from .models import Status
+from .models import Status, parsing_csv
 
 
 # Create your views here.
@@ -47,106 +47,18 @@ def report_index(request):
     return render(request, 'reports/index.html', context)
 
 
-def parsing_file_and_save_statuses_to_base(path):
-    """
-    Импорт csv-файла в базу
-    :param path:
-    :return: список строк кратких описаний статусов
-    """
-    f = open(path, 'r')
-    i = 0
-    c = 0
-    e = 0
-    status_arr = []
-    for line in f:
-        i += 1
-        line = line[0:-1].split(',')
-
-        status, created = Status.create(line)
-
-        if created:
-            c += 1
-        if not status.no_error:
-            e += 1
-            print(line[8])
-        status_arr.append([
-            line[0],
-            float(line[1]) / 100,
-            float(line[2]) / 100,
-            float(line[3]) / 10,
-            float(line[4]) / 10,
-            line[5],
-            line[6],
-            line[7],
-            line[8],
-            status.no_error
-        ])
-    f.close()
-    return i, c, e, status_arr
-
-
-def import_one_csv(debug=False):
-    """
-
-    :param debug:
-    :return: список строк кратких описаний статусов
-    """
-    statuses = []
-    i = 0
-    total_n = 0
-    total_c = 0
-    total_e = 0
-    files = os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in'))
-    if files:
-        f = files[0]
-        if f.endswith('.csv'):
-            i += 1
-            print(f)
-            n, c, e, statuses = parsing_file_and_save_statuses_to_base(
-                os.path.join(settings.MEDIA_ROOT, 'import_in', f))
-            total_n += n
-            total_c += c
-            total_e += e
-
-            if not debug:
-                try:
-                    os.rename(
-                        os.path.join(settings.MEDIA_ROOT, 'import_in', f),
-                        os.path.join(settings.MEDIA_ROOT, 'import_arh', f),
-                    )
-                except OSError as exc:
-                    print(exc.strerror)
-
-    info = {'reads': total_n, 'inserts': total_c, 'errors': total_e}
-    if debug:
-        print(info)
-
-    return statuses
-
-
-def import_all_csv():
-    files = os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in'))
-    print(files)
-    for path in files:
-        if path.endswith('.csv'):
-            print(path)
-            i, c, e, statuses = parsing_file_and_save_statuses_to_base(
-                os.path.join(settings.MEDIA_ROOT, 'import_in', path))
-            print('reads:{}, inserts:{}, errors:{}'.format(i, c, e))
-    return True
-
-
 def import_csv_view(request):
-    files = os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in'))
+    statuses = []
+    status_count = 0
+    status_created = 0
+    status_errored = 0
     context = {'file': '', 'lines_sum': 0}
-
+    files = os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in'))
     files.sort()
-
     for f in files[::-1]:
         if f.endswith('.csv'):
-            path = f
             lines_sum = sum(1 for l in open(os.path.join(settings.MEDIA_ROOT, 'import_in', f), 'r'))
-            context = {'file': f, 'lines_sum': lines_sum, 'remained': len(files) - 1}
+            context = {'file': f, 'lines_sum': lines_sum, 'remained': len(files)}
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -158,9 +70,15 @@ def import_csv_view(request):
             cd = form.cleaned_data
             path = cd['file']
 
-            i, c, e, statuses = parsing_file_and_save_statuses_to_base(
-                os.path.join(settings.MEDIA_ROOT, 'import_in', path))
-            context['info'] = {'reads': i, 'inserts': c, 'errors': e}
+            lines = parsing_csv(os.path.join(settings.MEDIA_ROOT, 'import_in', path))
+            for line in lines:
+                status, c, e, = Status.create(line)
+                status_count += 1
+                status_created += c
+                status_errored += e
+                statuses.append(status)
+
+            context['info'] = {'reads': status_count, 'inserts': status_created, 'errors': status_errored}
             context['statuses'] = statuses
 
             try:
