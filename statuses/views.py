@@ -48,10 +48,6 @@ def report_index(request):
 
 
 def import_csv_view(request):
-    statuses = []
-    status_count = 0
-    status_created = 0
-    status_errored = 0
     context = {'file': '', 'lines_sum': 0}
     files = os.listdir(os.path.join(settings.MEDIA_ROOT, 'import_in'))
     files.sort()
@@ -70,16 +66,7 @@ def import_csv_view(request):
             cd = form.cleaned_data
             path = cd['file']
 
-            lines = parsing_csv(os.path.join(settings.MEDIA_ROOT, 'import_in', path))
-            for line in lines:
-                status, c, e, = Status.create(line)
-                status_count += 1
-                status_created += c
-                status_errored += e
-                statuses.append(status)
-
-            context['info'] = {'reads': status_count, 'inserts': status_created, 'errors': status_errored}
-            context['statuses'] = statuses
+            context['info'], context['statuses'] = import_csv(path)
 
             try:
                 os.rename(
@@ -96,6 +83,24 @@ def import_csv_view(request):
         form = ImportForm(initial={'file': context['file']})
     context['form'] = form
     return render(request, 'statuses/import.html', context)
+
+
+def import_csv(filename):
+    statuses = []
+    status_count = 0
+    status_created = 0
+    status_errored = 0
+    lines = parsing_csv(os.path.join(settings.MEDIA_ROOT, 'import_in', filename))
+    for line in lines:
+        status, c, e, = Status.create(line)
+        status_count += 1
+        status_created += c
+        status_errored += e
+        statuses.append(status)
+
+    info = {'reads': status_count, 'inserts': status_created, 'errors': status_errored}
+
+    return info, statuses
 
 
 def ajax_test(request):

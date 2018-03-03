@@ -1,5 +1,5 @@
-from django.test import TestCase
 from django.core.urlresolvers import resolve
+from django.test import TestCase
 
 from statuses.views import index_statuses_view, StatusDayView, StatusDetailView
 
@@ -18,7 +18,7 @@ class StatusURLTestCase(TestCase):
         """
         Тест что status_list_view c датой обрабатывается правильной функцией
         """
-        found = resolve('/status/2017/08/07/')
+        found = resolve('/status/2017/01/21/')
         self.assertEquals(found.func.__name__, StatusDayView.__name__)
         self.assertEquals(found.func.view_class, StatusDayView)
 
