@@ -21,7 +21,8 @@ def unload_list_view(request):
             unloads_queryset = unloads_queryset.filter(
                 date = datetime.datetime.strptime(
                     request.GET.get('date'),
-                    '%d.%m.%Y'
+                    # '%d.%m.%Y'
+                    '%Y-%m-%d'
                 ).date(),
             )
         context = {'unloads': unloads_queryset}

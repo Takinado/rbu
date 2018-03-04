@@ -1,11 +1,14 @@
 from django.conf.urls import url
 
-from .views import StatusDayView, StatusDetailView
-from .views import ajax_test, get_more_tables
-from .views import import_csv_view
-from .views import index_statuses_view, test_page
-from .views import select_status_day
-from .views import status_month_calc
+from .views import (
+    StatusDayView,
+    StatusDetailView,
+    ajax_test, get_more_tables,
+    import_csv_view,
+    index_statuses_view, test_page,
+    select_status_day,
+    status_month_calc,
+)
 
 urlpatterns = [
     # url(r'^$', unload_list_view, name='report_index'),

@@ -306,22 +306,22 @@ class Status(models.Model):
 
     @property
     def is_mix_empty(self):
-        if 0 != self.mix_him or 0 != self.mix_water or 0 != self.mix_cement:
+        if self.mix_him != 0 or self.mix_water != 0 or self.mix_cement != 0:
             return False
-        if 0 != self.mix_breakstone or 0 != self.mix_sand:
+        if self.mix_breakstone != 0 or self.mix_sand != 0:
             return False
         return True
 
     def calculate_status(self):
-        """
-        Calculate all parameters of status
-        :return:
-        """
+        previous_status = self.get_previous()
+        return
+
+    def get_previous(self):
         # https://docs.djangoproject.com/en/1.11/ref/models/instances/#django.db.models.Model.get_previous_by_FOO
         try:
             previous_status = self.get_previous_by_datetime()
         except Status.DoesNotExist:
-            return
+            return None
 
         return previous_status
 
@@ -333,6 +333,9 @@ class Status(models.Model):
         verbose_name = 'статус РБУ'
         verbose_name_plural = 'статусы РБУ'
 
+
+def calculate_all_statuses():
+    return
 
 class LoadBunker(models.Model):
     status_prev = models.ForeignKey(Status, verbose_name='Статус ДО', related_name="status_prev")

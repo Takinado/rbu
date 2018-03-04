@@ -1,10 +1,10 @@
 import calendar
 import os
-from datetime import datetime
+from datetime import datetime, date
 
 import simplejson
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.generic import DayArchiveView, DetailView
 from django.views.generic.dates import MonthMixin
@@ -19,6 +19,7 @@ from .models import Status, parsing_csv
 
 def index_statuses_view(request):
     today = datetime.today().date()
+    today = date(2018, 1, 21)
     return redirect('status_list_view', year=today.year, month=today.month, day=today.day)
 
 
@@ -32,9 +33,9 @@ def report_index(request):
     # now.day = '29'
 
     now = {
-        'year': 2017,
-        'month': 8,
-        'day': 7
+        'year': 2018,
+        'month': 1,
+        'day': 21
     }
 
     status = Status()
@@ -273,3 +274,8 @@ def find_unload_in_statuses(prev_status, status):
         if not prev_status.is_mix_empty:
             return True
     return False
+
+
+def reset_base(request):
+    Status.objects.all().delete()
+    return HttpResponseRedirect('/')
