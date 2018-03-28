@@ -20,6 +20,7 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from statuses.views import report_index, reset_base
+from unloads.views import reset_unload_base
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -28,6 +29,7 @@ urlpatterns = [
     url(r'^unload/', include('unloads.urls')),
     url(r'^report/', include('reports.urls')),
     url(r'^resetbase/$', reset_base, name="reset_base"),
+    url(r'^resetunload/$', reset_unload_base, name="reset_unload_base"),
 ]
 
 if settings.DEBUG:

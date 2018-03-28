@@ -9,9 +9,9 @@ from .models import Unload, UnloadType, Carrier
 
 
 class UnloadAdmin(ModelAdmin):
-    date_hierarchy = 'date'
+    date_hierarchy = 'datetime'
     list_display = (
-        'date',
+        'datetime',
         'type',
         'him',
         'water',
@@ -19,7 +19,7 @@ class UnloadAdmin(ModelAdmin):
         'breakstone',
         'sand',
     )
-    ordering = ('date',)
+    ordering = ('datetime',)
 
     class Meta:
         model = Unload
@@ -30,6 +30,7 @@ class CarrierAdmin(ModelAdmin):
 
     class Meta:
         model = Carrier
+
 
 admin.site.register(Unload, UnloadAdmin)
 admin.site.register(UnloadType)

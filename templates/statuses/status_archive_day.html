@@ -83,7 +83,9 @@
             {% for status in status_list %}
             <tr class="status-row {% if not status.no_error %} error{% endif %}">
                 <td>{{ forloop.counter }}</td>
-                <td><a href="/status/{{ status.pk }}">{{ status.date|date:'d-m-y' }} {{ status.time|date:'H:i:s' }}</a></td>
+                <td>
+                    <a href="/status/{{ status.pk }}">{{ status.datetime|date:'d-m-y' }} {{ status.datetime|date:'H:i:s' }}</a>
+                </td>
                 <td><a href="{% static status.img.url %}">{{ status.get_img }}</a></td>
                 <td{% if status.vents1.is_him_in %} class='active_him'{% endif %}>{{ status.him1 }}</td>
                 <td{% if status.vents1.is_water_in %} class='active_water'{% endif %}>{{ status.water }}</td>

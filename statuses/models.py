@@ -190,7 +190,8 @@ class Status(models.Model):
     skip_sand = models.SmallIntegerField(default=0, verbose_name='песок в скипе')
     storage_breakstone = models.SmallIntegerField(default=0, verbose_name='щебень в накопителе')
     storage_sand = models.SmallIntegerField(default=0, verbose_name='песок в накопителе')
-    unload = models.ForeignKey('unloads.Unload', blank=True, null=True, verbose_name='Выгрузка')
+    unload = models.ForeignKey('unloads.Unload', on_delete=models.SET_NULL, blank=True, null=True,
+                               verbose_name='Выгрузка')
     is_processed = models.BooleanField(default=False, verbose_name='Обработан')
 
     get_latest_by = 'datetime'
@@ -360,25 +361,24 @@ class Status(models.Model):
         else:
             self.mix_breakstone = prev_status.mix_breakstone
         # Выгрузка
-        if self.find_unload_in_statuses():
+        if self.is_status_end_unload():
             self.mix_him = self.mix_water = self.mix_cement = self.mix_breakstone = self.mix_sand = 0
 
         self.is_processed = True
         self.save()
         return
 
-    def find_unload_in_statuses(self):
+    def is_status_end_unload(self):
         """
         Поиск отгрузки
         """
         prev_status = self.get_previous()
-        if self.rbu_statuses.mixer == 'O' and prev_status.rbu_statuses.mixer != 'O':
-            if not prev_status.is_mix_empty:
-                return True
+        if self.rbu_statuses.mixer == 'O' and prev_status.rbu_statuses.mixer != 'O' and not prev_status.is_mix_empty:
+            return True
         return False
 
     def __str__(self):
-        return '{} {}'.format(self.date.strftime("%d.%m.%Y"), self.time.strftime("%H:%M:%S"))
+        return self.datetime.strftime("%d.%m.%Y %H:%M:%S")
 
     class Meta:
         ordering = ['-datetime', ]

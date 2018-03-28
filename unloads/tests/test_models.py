@@ -1,9 +1,11 @@
 import datetime
 
 from django.test import TestCase
-# from django.utils import timezone
 
 from unloads.models import Unload
+
+
+# from django.utils import timezone
 
 
 class UnloadModelTestCase(TestCase):
@@ -11,7 +13,7 @@ class UnloadModelTestCase(TestCase):
     def setUp(self):
         self.unload = Unload.objects.create(
             # date=timezone.now(),
-            date=datetime.date(2017, 9, 1),
+            datetime=datetime.datetime(2017, 9, 1),
             him=3.5,
             water=100,
             cement=300,
@@ -26,6 +28,6 @@ class UnloadModelTestCase(TestCase):
         """
         self.assertEqual(self.unload.cement, 300)
         self.assertEqual(
-            self.unload.date,
-            datetime.datetime.strptime('01.09.2017', '%d.%m.%Y').date(),
+            self.unload.datetime,
+            datetime.datetime.strptime('01.09.2017', '%d.%m.%Y'),
         )

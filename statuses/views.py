@@ -10,6 +10,7 @@ from django.views.generic import DayArchiveView, DetailView
 from django.views.generic.dates import MonthMixin
 
 from rbu import settings
+from unloads.models import Unload
 from .forms import ImportForm, ToDoForm
 from .models import Status, parsing_csv, calculate_all_statuses
 
@@ -218,5 +219,6 @@ def calc_statuses(request):
 
 
 def reset_base(request):
+    Unload.objects.all().delete()
     Status.objects.all().delete()
     return HttpResponseRedirect('/')
