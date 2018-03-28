@@ -156,6 +156,10 @@ def parsing_csv(path):
     return lines
 
 
+def create_img_name(path):
+    return path.split('\\')[-1][:-4]
+
+
 class Status(models.Model):
     datetime = models.DateTimeField(verbose_name='дата', db_index=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -188,6 +192,8 @@ class Status(models.Model):
     storage_sand = models.SmallIntegerField(default=0, verbose_name='песок в накопителе')
     unload = models.ForeignKey('unloads.Unload', blank=True, null=True, verbose_name='Выгрузка')
     is_processed = models.BooleanField(default=False, verbose_name='Обработан')
+
+    get_latest_by = 'datetime'
 
     # add our custom model manager
     # objects = StatusManager()
@@ -245,7 +251,7 @@ class Status(models.Model):
         status.breakstone1 = line[5]
         status.sand = line[6]
         status.breakstone2 = line[7]
-        status.img = line[8]
+        status.img = create_img_name(line[8])
 
         rbu_status, created = RbuStatus.objects.get_or_create(
             cem_bunker_active=line[27],
@@ -280,7 +286,7 @@ class Status(models.Model):
             composite=not char_to_bool(line[12])
         )
 
-        status, created = Status.objects.get_or_create(
+        created_status, created = Status.objects.get_or_create(
             datetime=status.datetime,
             date=status.date,
             time=status.time,
@@ -293,16 +299,16 @@ class Status(models.Model):
             breakstone2=int(line[7]),
             no_error=False if 'e' in line[:30] else True,
             warning=True if line[1] != line[2] or line[5] != line[6] or line[5] != line[7] else False,
-            img=line[8],
+            img=create_img_name(line[8]),
             vents1=in_vents,
             vents2=out_vents,
             rbu_statuses=rbu_status
         )
-        return status, created, not status.no_error
+        return created_status, created, not created_status.no_error
 
     @property
     def get_img_shortname(self):
-        return self.img.path.split('\\')[-1]
+        return '{}.jpg'.format(self.img.path)
 
     @property
     def is_mix_empty(self):
@@ -312,30 +318,95 @@ class Status(models.Model):
             return False
         return True
 
-    def calculate_status(self):
-        previous_status = self.get_previous()
-        return
-
     def get_previous(self):
         # https://docs.djangoproject.com/en/1.11/ref/models/instances/#django.db.models.Model.get_previous_by_FOO
         try:
             previous_status = self.get_previous_by_datetime()
         except Status.DoesNotExist:
-            return None
-
+            return self
         return previous_status
+
+    def calculate_status(self):
+        """
+        Вычисление параметров статуса
+        """
+        prev_status = self.get_previous()
+        # Химию в миксер
+        if self.vents2.him or prev_status.vents2.him:
+            self.mix_him = round(prev_status.him1 - self.him1 + prev_status.mix_him, 2)
+        else:
+            self.mix_him = prev_status.mix_him
+        # Воду в миксер
+        if self.vents2.water or prev_status.vents2.water:
+            self.mix_water = round(prev_status.water - self.water + prev_status.mix_water, 2)
+        else:
+            self.mix_water = prev_status.mix_water
+        # Цемент в миксер
+        if self.vents2.cement or prev_status.vents2.cement:
+            self.mix_cement = round(prev_status.cement - self.cement + prev_status.mix_cement, 2)
+        else:
+            self.mix_cement = prev_status.mix_cement
+        # Смесь в скип
+        if prev_status.vents2.composite:
+
+            delta = prev_status.breakstone1 - self.breakstone1
+            self.skip_breakstone = prev_status.skip_breakstone + delta
+        else:
+            self.skip_breakstone = prev_status.skip_breakstone
+        # Скип в миксер
+        if self.rbu_statuses.skip == 'N' and prev_status.rbu_statuses.skip == 'F':
+            self.mix_breakstone = prev_status.mix_breakstone + self.skip_breakstone
+            self.skip_breakstone = 0
+        else:
+            self.mix_breakstone = prev_status.mix_breakstone
+        # Выгрузка
+        if self.find_unload_in_statuses():
+            self.mix_him = self.mix_water = self.mix_cement = self.mix_breakstone = self.mix_sand = 0
+
+        self.is_processed = True
+        self.save()
+        return
+
+    def find_unload_in_statuses(self):
+        """
+        Поиск отгрузки
+        """
+        prev_status = self.get_previous()
+        if self.rbu_statuses.mixer == 'O' and prev_status.rbu_statuses.mixer != 'O':
+            if not prev_status.is_mix_empty:
+                return True
+        return False
 
     def __str__(self):
         return '{} {}'.format(self.date.strftime("%d.%m.%Y"), self.time.strftime("%H:%M:%S"))
 
     class Meta:
-        ordering = ['-date', ]
+        ordering = ['-datetime', ]
         verbose_name = 'статус РБУ'
         verbose_name_plural = 'статусы РБУ'
 
 
+def count_uncalculated_statuses():
+    statuses = Status.objects.filter(is_processed=False).count()
+    return statuses
+
+
 def calculate_all_statuses():
+    start_status = Status.objects.filter(is_processed=False).earliest('datetime')
+    end_status = Status.objects.latest('datetime')
+    calculate_statuses(start_status, end_status)
     return
+
+
+def calculate_statuses(start_status, end_status):
+    uncalculated_statuses = Status.objects.filter(
+        datetime__gte=start_status.datetime,
+        datetime__lte=end_status.datetime
+    )
+    for status in uncalculated_statuses:
+        status.calculate_status()
+    return
+
 
 class LoadBunker(models.Model):
     status_prev = models.ForeignKey(Status, verbose_name='Статус ДО', related_name="status_prev")

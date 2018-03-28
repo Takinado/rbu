@@ -11,7 +11,7 @@ from django.views.generic.dates import MonthMixin
 
 from rbu import settings
 from .forms import ImportForm, ToDoForm
-from .models import Status, parsing_csv
+from .models import Status, parsing_csv, calculate_all_statuses
 
 
 # Create your views here.
@@ -156,7 +156,10 @@ def select_status_day(request):
     """
     if 'date' in request.GET:
         date = request.GET['date']
-        d = datetime.strptime(date, '%Y-%m-%d')
+        try:
+            d = datetime.strptime(date, '%Y-%m-%d')
+        except ValueError:
+            return redirect('status_index')
         return redirect('status_list_view', year=d.year, month=d.month, day=d.day)
 
     # TODO Убрать этот костыль. Сделать Проверку введённых данных - в обработчике формы после MVP
@@ -169,6 +172,7 @@ def status_month_calc(request, year=None, month=None):
     for day in range(1, calendar.monthrange(2017, 9)[1] + 1):
         print(day)
         status_day_calc(request, year=year, month=month, day=day)
+    return redirect('status_index')
 
 
 def status_day_calc(request, year=None, month=None, day=None):
@@ -195,85 +199,22 @@ def status_day_calc(request, year=None, month=None, day=None):
     status_list = status_list_full.filter(no_error=True).order_by('date')
 
     if len(status_list) >= 1:
-        Status.objects.filter(id=status_list[0].id).update(is_processed=True)
-    if len(status_list) > 1:
-        for i in range(1, len(status_list)):
-            status_calc(status_list[i - 1], status_list[i])
-
-            Status.objects.filter(id=status_list[i].id).update(
-                mix_him=status_list[i].mix_him,
-                mix_water=status_list[i].mix_water,
-                mix_cement=status_list[i].mix_cement,
-                mix_breakstone=status_list[i].mix_breakstone,
-                mix_sand=status_list[i].mix_sand,
-                skip_breakstone=status_list[i].skip_breakstone,
-                skip_sand=status_list[i].skip_sand,
-                storage_breakstone=status_list[i].storage_breakstone,
-                storage_sand=status_list[i].storage_sand,
-                is_processed=True,
-            )
+        for status in status_list:
+            status.calculate_status()
 
     context = {'status_list': status_list,
                'error_count': error_count,
                'title': 'Расчет статусов за день'
                }
-    return render(request, 'rbu/status_list.html', context)
+    return render(request, 'statuses/status_archive_day.html', context)
 
 
-def status_calc(prev_status, status):
-    """
-    Вычисление параметров статуса
-    :param prev_status:
-    :param status:
-    :return:
-    """
-
-    # Химию в миксер
-    if status.vents2.him or prev_status.vents2.him:
-        status.mix_him = round(prev_status.him1 - status.him1 + prev_status.mix_him, 2)
-    else:
-        status.mix_him = prev_status.mix_him
-    # Воду в миксер
-    if status.vents2.water or prev_status.vents2.water:
-        status.mix_water = round(prev_status.water - status.water + prev_status.mix_water, 2)
-    else:
-        status.mix_water = prev_status.mix_water
-    # Цемент в миксер
-    if status.vents2.cement or prev_status.vents2.cement:
-        status.mix_cement = round(prev_status.cement - status.cement + prev_status.mix_cement, 2)
-    else:
-        status.mix_cement = prev_status.mix_cement
-    # Смесь в скип
-    if prev_status.vents2.composite:
-
-        delta = prev_status.breakstone1 - status.breakstone1
-        status.skip_breakstone = prev_status.skip_breakstone + delta
-    else:
-        status.skip_breakstone = prev_status.skip_breakstone
-    # Скип в миксер
-    if status.rbu_statuses.skip == 'N' and prev_status.rbu_statuses.skip == 'F':
-        status.mix_breakstone = prev_status.mix_breakstone + status.skip_breakstone
-        status.skip_breakstone = 0
-    else:
-        status.mix_breakstone = prev_status.mix_breakstone
-    # Выгрузка
-    if find_unload_in_statuses(prev_status, status):
-        status.mix_him = status.mix_water = status.mix_cement = status.mix_breakstone = status.mix_sand = 0
-
-    return status
-
-
-def find_unload_in_statuses(prev_status, status):
-    """
-    Поиск отгрузки
-    :param prev_status:
-    :param status:
-    :return:
-    """
-    if status.rbu_statuses.mixer == 'O' and prev_status.rbu_statuses.mixer != 'O':
-        if not prev_status.is_mix_empty:
-            return True
-    return False
+def calc_statuses(request):
+    # status_list_full = Status.objects.select_related('rbu_statuses', 'vents1', 'vents2').order_by('date')
+    # error_count = status_list_full.filter(no_error=False).count()
+    # status_list = status_list_full.filter(no_error=True).order_by('date')
+    calculate_all_statuses()
+    return redirect('status_index')
 
 
 def reset_base(request):

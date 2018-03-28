@@ -4,7 +4,12 @@ from datetime import datetime
 from django.test import TestCase
 
 from rbu.settings import BASE_DIR
-from statuses.models import Status, parsing_csv, calculate_all_statuses
+from statuses.models import (
+    Status,
+    parsing_csv,
+    calculate_all_statuses,
+    count_uncalculated_statuses
+)
 
 
 class StatusModelTestCase(TestCase):
@@ -61,8 +66,9 @@ class StatusModelTestCase(TestCase):
         )
 
     def test_previous_status_not_exist(self):
-        self.assertIsNone(
-            self.status2.get_previous()
+        self.assertEqual(
+            self.status2.get_previous(),
+            self.status2
         )
 
     def test_parsing_csv(self):
@@ -80,8 +86,12 @@ class StatusModelTestCase(TestCase):
         )
 
     def test_all_statuses_calculated(self):
+        self.assertEqual(
+            count_uncalculated_statuses(),
+            9
+        )
         calculate_all_statuses()
-        not_calculated_statuses = Status.objects.filter(is_processed=False)
-        self.assertIsNone(
-            not_calculated_statuses
+        self.assertEqual(
+            count_uncalculated_statuses(),
+            0
         )
